@@ -1,57 +1,69 @@
 import React from 'react';
-// Fix: Add file extension to satisfy bundler/type checker.
-import { CardField } from '../types.ts';
-// Fix: Add file extension to satisfy bundler/type checker.
-import GlassCard from './GlassCard.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import { ChevronUpIcon, ChevronDownIcon } from './icons.tsx';
+import { CardField, FieldType } from '../types.ts';
+import HapticButton from './HapticButton.tsx';
+import { PlusIcon, CloseIcon, LinkIcon } from './icons.tsx';
 
 interface DraggableFieldListProps {
     fields: CardField[];
-    onFieldsChange: (fields: CardField[]) => void;
+    setFields: React.Dispatch<React.SetStateAction<CardField[]>>;
 }
 
-const DraggableFieldList: React.FC<DraggableFieldListProps> = ({ fields, onFieldsChange }) => {
+const DraggableFieldList: React.FC<DraggableFieldListProps> = ({ fields, setFields }) => {
 
     const handleFieldChange = (id: string, value: string) => {
-        const newFields = fields.map(field => field.id === id ? { ...field, value } : field);
-        onFieldsChange(newFields);
+        setFields(prevFields => 
+            prevFields.map(field => field.id === id ? { ...field, value } : field)
+        );
     };
-    
-    const moveField = (index: number, direction: 'up' | 'down') => {
-        const newFields = [...fields];
-        const targetIndex = direction === 'up' ? index - 1 : index + 1;
-        if (targetIndex >= 0 && targetIndex < newFields.length) {
-            [newFields[index], newFields[targetIndex]] = [newFields[targetIndex], newFields[index]];
-            onFieldsChange(newFields);
-        }
+
+    const handleAddField = () => {
+        const newField: CardField = {
+            id: `field-${Date.now()}`,
+            label: 'New Field',
+            value: '',
+            icon: LinkIcon, // Use a default icon
+            fieldType: FieldType.Text,
+        };
+        setFields(prevFields => [...prevFields, newField]);
+    };
+
+    const handleRemoveField = (id: string) => {
+        setFields(prevFields => prevFields.filter(field => field.id !== id));
     };
 
     return (
-        <GlassCard className="p-4 space-y-4">
-            {fields.map((field, index) => (
-                <div key={field.id} className="flex items-center space-x-2">
-                    <div className="flex-grow">
-                        <label className="text-xs text-gray-400 font-semibold ml-2">{field.label}</label>
-                        <input
-                            type="text"
-                            value={field.value}
-                            placeholder={field.placeholder}
-                            onChange={(e) => handleFieldChange(field.id, e.target.value)}
-                            className="w-full bg-white/10 text-white placeholder-gray-500 rounded-lg p-2 border border-transparent focus:border-bamboo-8 focus:ring-0 focus:outline-none transition"
-                        />
-                    </div>
-                    <div className="flex flex-col">
-                        <button onClick={() => moveField(index, 'up')} disabled={index === 0} className="p-1 rounded-md hover:bg-white/20 disabled:opacity-30">
-                            <ChevronUpIcon className="w-5 h-5"/>
-                        </button>
-                        <button onClick={() => moveField(index, 'down')} disabled={index === fields.length - 1} className="p-1 rounded-md hover:bg-white/20 disabled:opacity-30">
-                            <ChevronDownIcon className="w-5 h-5" />
-                        </button>
-                    </div>
-                </div>
-            ))}
-        </GlassCard>
+        <div>
+            <div className="flex justify-between items-center mb-3">
+                <h3 className="text-lg font-semibold text-white">Card Fields</h3>
+                 <HapticButton 
+                    onClick={handleAddField}
+                    className="flex items-center space-x-1 text-bamboo-8 font-semibold text-sm"
+                >
+                    <PlusIcon className="w-4 h-4" />
+                    <span>Add</span>
+                </HapticButton>
+            </div>
+            <div className="space-y-3">
+                {fields.map(field => {
+                    const Icon = field.icon;
+                    return (
+                        <div key={field.id} className="flex items-center space-x-2">
+                            <Icon className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                            <input 
+                                type={field.fieldType === FieldType.Video ? 'url' : 'text'}
+                                value={field.value}
+                                onChange={(e) => handleFieldChange(field.id, e.target.value)}
+                                placeholder={field.label}
+                                className="w-full bg-white/5 p-2 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-bamboo-8"
+                            />
+                            <HapticButton onClick={() => handleRemoveField(field.id)} className="text-gray-500 hover:text-white p-1">
+                                <CloseIcon className="w-4 h-4" />
+                            </HapticButton>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
     );
 };
 

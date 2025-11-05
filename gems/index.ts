@@ -1,4 +1,32 @@
-export { default as CarbonSavedGem } from './CarbonSavedGem.tsx';
-export { default as FollowUpGem } from './FollowUpGem.tsx';
-export { default as IcebreakerGem } from './IcebreakerGem.tsx';
-export { default as SmartTagGem } from './SmartTagGem.tsx';
+import CarbonSavedGem from './CarbonSavedGem.tsx';
+import FollowUpGem from './FollowUpGem.tsx';
+import IcebreakerGem from './IcebreakerGem.tsx';
+import SmartTagGem from './SmartTagGem.tsx';
+import { GemDefinition } from '../types.ts';
+
+export const initialGems: GemDefinition[] = [
+    {
+        id: 'gem-icebreaker',
+        name: 'Icebreaker',
+        description: 'AI-suggested conversation starters.',
+        component: IcebreakerGem,
+    },
+    {
+        id: 'gem-carbon',
+        name: 'Carbon Saved',
+        description: 'Show your environmental impact.',
+        component: CarbonSavedGem,
+    },
+    {
+        id: 'gem-smart-tag',
+        name: 'Smart Tags',
+        description: 'AI tags your skills and interests.',
+        component: SmartTagGem,
+    },
+    {
+        id: 'gem-follow-up',
+        name: 'Follow-up',
+        description: 'Generate a custom follow-up message.',
+        component: FollowUpGem,
+    },
+];

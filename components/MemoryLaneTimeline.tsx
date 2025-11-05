@@ -1,6 +1,7 @@
 import React from 'react';
 import { Interaction, InteractionType } from '../types.ts';
 import { TapIcon, NetworkIcon, CallIcon, EmailIcon, EditIcon, PinIcon, TreeIcon } from './icons.tsx';
+import { springTransition } from '../utils/spring.ts';
 
 // Helper to get an icon for each interaction type
 const getInteractionIcon = (type: InteractionType) => {
@@ -44,7 +45,10 @@ const MemoryLaneTimeline: React.FC<MemoryLaneTimelineProps> = ({ interactions })
                     </div>
                     
                     {/* Content */}
-                    <div className="flex-1 bg-black/10 p-3 rounded-lg border border-white/10 transform-style-3d hover:[transform:rotateY(-5deg)_scale(1.02)] transition-transform duration-300">
+                    <div 
+                        style={springTransition}
+                        className="flex-1 bg-black/10 p-3 rounded-lg border border-white/10 transform-style-3d hover:[transform:rotateY(-5deg)_scale(1.02)]"
+                    >
                         <div className="flex justify-between items-baseline">
                             <p className="font-bold text-white">{item.type}</p>
                             <p className="text-xs text-gray-400">{new Date(item.date).toLocaleDateString()}</p>

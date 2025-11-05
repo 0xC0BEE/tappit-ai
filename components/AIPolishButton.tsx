@@ -3,6 +3,12 @@ import { WandIcon } from './icons.tsx';
 import HapticButton from './HapticButton.tsx';
 import { useHaptics, HapticPattern } from '../hooks/useHaptics.ts';
 
+declare global {
+    interface Window {
+        confetti?: (options: any) => void;
+    }
+}
+
 interface AIPolishButtonProps {
     onClick: () => Promise<void>;
 }
@@ -25,6 +31,7 @@ const AIPolishButton: React.FC<AIPolishButtonProps> = ({ onClick }) => {
             }
         } catch (error) {
             console.error("AI Polish failed:", error);
+            alert("Sorry, the AI couldn't polish your card right now. Please try again later.");
         } finally {
             setLoading(false);
         }

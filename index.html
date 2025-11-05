@@ -1,105 +1,112 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tappit AI</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .text-glow {
-        text-shadow: 0 0 8px currentColor;
-      }
-      .transform-style-3d {
-        transform-style: preserve-3d;
-      }
-      .perspective-1000 {
-        perspective: 1000px;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tappit AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Sentry SDK (T-14) -->
+    <script
+      src="https://browser.sentry-cdn.com/7.54.0/bundle.tracing.min.js"
+      integrity="sha384-XX8gY8fHTicH8a2b/b9s22l8zB82l3/rZIXoYh2a15o2h5Bv4BGJ/7i1rRB2i7hT"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://browser.sentry-cdn.com/7.54.0/replay.min.js"
+      integrity="sha384-C2ReUBi6tM12iQ3o3S89q7BwW3Qv6d8DGUzS2L0K/CwScs+oO9/xVd2x/S7L3a9L"
+      crossorigin="anonymous"
+    ></script>
+    <!-- PostHog Analytics -->
+    <script>
+      !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}var l=t.createElement("script");l.type="text/javascript",l.async=!0,l.src=s.api_host+"/static/array.js",(p=t.getElementsByTagName("script")[0]).parentNode.insertBefore(l,p);var c=e;for(void 0!==a?c=e[a]=[]:a="posthog",c.people=c.people||[],c.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},c.people.toString=function(){return c.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags".split(" "),n=0;n<o.length;n++)g(c,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+      posthog.init('YOUR_POSTHOG_KEY', {api_host: 'https://app.posthog.com'})
+    </script>
+    <!-- Additional Libraries -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0",
+        "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+        "@jest/globals": "https://aistudiocdn.com/@jest/globals@^30.2.0",
+        "@testing-library/react": "https://aistudiocdn.com/@testing-library/react@^16.3.0"
       }
     }
-  </style>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            bamboo: {
-              '1': '#f1f9f1',
-              '2': '#e2f3e4',
-              '3': '#cbeacb',
-              '4': '#b0e0b3',
-              '5': '#94d59b',
-              '6': '#74cb81',
-              '7': '#51b865',
-              '8': '#33a14d', // Main Green
-              '9': '#25893a',
-              '10': '#1e7531',
-              '11': '#176028',
-              '12': '#0b2f11',
-            },
-          },
-          fontFamily: {
-            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji'],
-          },
-           borderRadius: {
-            '4xl': '2rem',
-            '5xl': '3rem',
-          },
-          keyframes: {
-            fadeIn: {
-              '0%': { opacity: '0' },
-              '100%': { opacity: '1' },
-            },
-            scaleIn: {
-              '0%': { opacity: '0', transform: 'scale(0.9)' },
-              '100%': { opacity: '1', transform: 'scale(1)' },
-            },
-            morph: {
-              '0%, 100%': { borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%' },
-              '50%': { borderRadius: '30% 60% 70% 40% / 50% 60% 30% 60%' },
-            },
-            cardFlyOut: {
-                '0%': { transform: 'translateY(0) scale(1)', opacity: '1' },
-                '100%': { transform: 'translateY(150%) scale(0.5)', opacity: '0' },
-            },
-            pulseGreen: {
-                '0%, 100%': { boxShadow: '0 0 0 0 rgba(51, 161, 77, 0.7)' },
-                '50%': { boxShadow: '0 0 0 12px rgba(51, 161, 77, 0)' },
-            },
-            timelineItemIn: {
-                '0%': { opacity: '0', transform: 'translateX(-20px) rotateY(-20deg)' },
-                '100%': { opacity: '1', transform: 'translateX(0) rotateY(0)' },
-            },
-          },
-          animation: {
-            fadeIn: 'fadeIn 0.5s ease-in-out',
-            scaleIn: 'scaleIn 0.5s ease-in-out',
-            morph: 'morph 8s ease-in-out infinite',
-            cardFlyOut: 'cardFlyOut 0.8s ease-in-out forwards',
-            pulseGreen: 'pulseGreen 2s infinite',
-            timelineItemIn: 'timelineItemIn 0.5s ease-out forwards',
-          },
-        },
-      },
-    }
-  </script>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0",
-    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0"
-  }
-}
-</script>
+    </script>
+    
+    <style>
+        /* Custom Font Definition (T-12) */
+        @font-face {
+            font-family: 'Bamboo';
+            src: url('/fonts/Bamboo.woff2') format('woff2'); /* Assuming the font file is in public/fonts */
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        /* Custom Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes morph { 0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; } }
+        @keyframes pulseGreen { 0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); } 50% { box-shadow: 0 0 0 12px rgba(22, 163, 74, 0); } }
+        @keyframes timelineItemIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .animate-fadeIn { animation: fadeIn 0.5s ease-in-out forwards; }
+        .animate-scaleIn { animation: scaleIn 0.5s ease-in-out forwards; }
+        .animate-morph { animation: morph 8s ease-in-out infinite; }
+        .animate-pulseGreen { animation: pulseGreen 2s infinite; }
+        .animate-timelineItemIn { animation: timelineItemIn 0.4s ease-out backwards; }
+
+        /* Perspective for 3D transforms */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        // Custom Font Family (T-12)
+                        bamboo: ['Bamboo', 'sans-serif'],
+                    },
+                    colors: {
+                        bamboo: {
+                            1: '#f0fdf4',
+                            2: '#dcfce7',
+                            3: '#bbf7d0',
+                            4: '#86efac',
+                            5: '#4ade80',
+                            6: '#22c55e',
+                            7: '#16a34a',
+                            8: '#15803d',
+                            9: '#166534',
+                            10: '#14532d',
+                            11: '#144225',
+                            12: '#0b2f11',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            /* Apply custom font to headings (T-12) */
+            h1, h2, h3 {
+                font-family: theme('fontFamily.bamboo');
+            }
+        }
+    </style>
 </head>
-<body class="bg-bamboo-12 antialiased">
-  <div id="root"></div>
+<body class="bg-bamboo-12">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>

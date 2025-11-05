@@ -1,107 +1,145 @@
-import React, { useState, useCallback } from 'react';
-import { GoogleGenAI } from "@google/genai";
-// Fix: Add file extension to satisfy bundler/type checker.
-import { CardField, CardTemplate, FieldType } from '../types.ts';
-// Fix: Add file extension to satisfy bundler/type checker.
-import { templates } from '../data/templates.ts';
-// Fix: Add file extension to satisfy bundler/type checker.
+import React, { useState } from 'react';
+import { GoogleGenAI } from '@google/genai';
 import TiltCardPreview from '../components/TiltCardPreview.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
+import GemSidebar from '../components/GemSidebar.tsx';
 import DraggableFieldList from '../components/DraggableFieldList.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
 import TemplateCarousel from '../components/TemplateCarousel.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import AIPolishButton from '../components/AIPolishButton.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import HapticButton from '../components/HapticButton.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
+import { CardField, CardTemplate, FieldType } from '../types.ts';
+import { templates } from '../data/templates.ts';
+import { BriefcaseIcon, EmailIcon, PhoneIcon, LinkIcon, MapPinIcon, PlayIcon, ShareIcon } from '../components/icons.tsx';
 import ShareModal from '../components/ShareModal.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import { ShareIcon } from '../components/icons.tsx';
+import HapticButton from '../components/HapticButton.tsx';
+import PublicCardScreen from './PublicCardScreen.tsx';
 
-// A mock initial state for the card fields
+// Initial state for the card fields
 const initialFields: CardField[] = [
-    { id: '1', label: 'Full Name', value: 'John Appleseed', placeholder: 'e.g. John Appleseed', type: FieldType.Text },
-    { id: '2', label: 'Title / Role', value: 'Creative Director', placeholder: 'e.g. CEO, Founder', type: FieldType.Text },
-    { id: '3', label: 'Company', value: 'Tappit', placeholder: 'e.g. Tappit AI', type: FieldType.Text },
-    { id: '4', label: 'Email', value: '', placeholder: 'e.g. hello@tappit.ai', type: FieldType.Email },
-    { id: '5', label: 'Website', value: '', placeholder: 'e.g. tappit.ai', type: FieldType.URL },
+    { id: 'f1', label: 'Name', value: 'Alex Bamboo', icon: BriefcaseIcon, fieldType: FieldType.Text },
+    { id: 'f2', label: 'Title', value: 'Senior Strategic Advisor', icon: BriefcaseIcon, fieldType: FieldType.Text },
+    { id: 'f3', label: 'Company', value: 'Tappit AI', icon: BriefcaseIcon, fieldType: FieldType.Text },
+    { id: 'f4', label: 'Email', value: 'alex.b@tappit.ai', icon: EmailIcon, fieldType: FieldType.Text },
+    { id: 'f5', label: 'Phone', value: '+1 234 567 8900', icon: PhoneIcon, fieldType: FieldType.Text },
+    { id: 'f6', label: 'Website', value: 'tappit.ai', icon: LinkIcon, fieldType: FieldType.Text },
+    { id: 'f7', label: 'Location', value: 'Bamboo Forest, Bali', icon: MapPinIcon, fieldType: FieldType.Text },
+    { id: 'f8', label: 'Intro Video', value: '', icon: PlayIcon, fieldType: FieldType.Video },
 ];
 
 const CardBuilderScreen: React.FC = () => {
     const [fields, setFields] = useState<CardField[]>(initialFields);
     const [template, setTemplate] = useState<CardTemplate>(templates[0]);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [isPreviewing, setIsPreviewing] = useState(false);
+    const [mobileTab, setMobileTab] = useState<'editor' | 'preview'>('editor');
+
+    const name = fields.find(f => f.label.toLowerCase().includes('name'))?.value || 'Your Name';
+    const title = fields.find(f => f.label.toLowerCase().includes('title'))?.value || 'Your Title';
     
-    const handleAIPolish = useCallback(async () => {
-        if (!process.env.API_KEY) {
-            console.error("API_KEY environment variable not set.");
-            alert("AI features are currently unavailable. API key is missing.");
-            return;
-        }
+    const handleAIPolish = async () => {
+        // This function demonstrates polishing a single field, e.g., the title.
+        const titleField = fields.find(f => f.label.toLowerCase().includes('title'));
+        if (!titleField) return;
 
         try {
+            // Fix: Initialize GoogleGenAI with named apiKey parameter as per coding guidelines.
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-            const currentDetails = fields.map(f => `${f.label}: ${f.value}`).join(', ');
-            const prompt = `Given the following business card details, suggest a more concise and impactful version for the "Title / Role". Keep it professional but modern. Details: ${currentDetails}. Return ONLY the improved title text, with no extra formatting or labels.`;
-            
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
-                contents: prompt,
+                contents: `Make this job title more impressive or creative: "${titleField.value}". Return only the new title.`,
+                config: {
+                    systemInstruction: "You are a professional title enhancer. You only return the enhanced title, with no extra text or quotes.",
+                }
             });
-
-            // Fix: Correctly access the generated text from the response object.
-            const polishedTitle = response.text.trim();
-
-            if (polishedTitle) {
-                setFields(prevFields => 
-                    prevFields.map(field => 
-                        field.label.toLowerCase().includes('title') 
-                        ? { ...field, value: polishedTitle } 
-                        : field
-                    )
-                );
-            }
+            // Fix: Use response.text to get the generated content as per coding guidelines.
+            const newTitle = response.text.trim();
+            setFields(prevFields => 
+                prevFields.map(field => field.id === titleField.id ? { ...field, value: newTitle } : field)
+            );
         } catch (error) {
-            console.error("Error with AI Polish:", error);
-            alert("Failed to polish details. Please try again.");
+            console.error("AI Polish failed:", error);
+            throw error; // Re-throw to be caught by the button's error handler
         }
-    }, [fields]);
+    };
+
+    if (isPreviewing) {
+        return <PublicCardScreen onBack={() => setIsPreviewing(false)} />;
+    }
+    
+    const EditorView = () => (
+         <div className="flex flex-col gap-6">
+            <DraggableFieldList fields={fields} setFields={setFields} />
+            <TemplateCarousel templates={templates} selectedTemplate={template} onSelectTemplate={setTemplate} />
+             <HapticButton 
+                onClick={() => setIsShareModalOpen(true)}
+                className="w-full flex items-center justify-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors">
+                <ShareIcon className="w-5 h-5" />
+                <span>Share</span>
+            </HapticButton>
+        </div>
+    );
 
     return (
-        <div className="animate-scaleIn h-full flex flex-col lg:flex-row lg:space-x-8">
-            {/* Left side: Preview */}
-            <div className="flex-shrink-0 lg:w-1/2 flex flex-col items-center justify-center p-4">
-                <TiltCardPreview fields={fields} template={template} />
-                 <HapticButton 
-                    onClick={() => setIsShareModalOpen(true)}
-                    className="mt-8 flex items-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors"
-                >
-                    <ShareIcon className="w-5 h-5" />
-                    <span>Share Card</span>
-                </HapticButton>
-            </div>
+        <>
+            <div className="animate-scaleIn h-full flex flex-col">
+                <header>
+                    <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7">
+                        Card Builder
+                    </h1>
+                    <p className="text-gray-300 text-lg mt-2">Design your digital identity.</p>
+                </header>
 
-            {/* Right side: Editor */}
-            <div className="flex-grow lg:w-1/2 flex flex-col space-y-6 overflow-y-auto p-4">
-                <TemplateCarousel 
-                    templates={templates} 
-                    selectedTemplate={template} 
-                    onSelectTemplate={setTemplate} 
-                />
+                {/* Mobile Tab Switcher */}
+                <div className="lg:hidden flex border-b border-white/10 my-4">
+                    <HapticButton 
+                        onClick={() => setMobileTab('editor')} 
+                        className={`flex-1 py-2 text-center font-semibold transition-colors relative ${mobileTab === 'editor' ? 'text-bamboo-7' : 'text-gray-400'}`}
+                    >
+                        Editor
+                        {mobileTab === 'editor' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-bamboo-7"></div>}
+                    </HapticButton>
+                    <HapticButton 
+                        onClick={() => setMobileTab('preview')} 
+                        className={`flex-1 py-2 text-center font-semibold transition-colors relative ${mobileTab === 'preview' ? 'text-bamboo-7' : 'text-gray-400'}`}
+                    >
+                        Preview
+                         {mobileTab === 'preview' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-bamboo-7"></div>}
+                    </HapticButton>
+                </div>
                 
-                <DraggableFieldList fields={fields} onFieldsChange={setFields} />
+                {/* Desktop Layout */}
+                <div className="hidden lg:grid lg:grid-cols-3 gap-8 flex-grow">
+                    <div className="lg:col-span-1 h-full flex flex-col gap-6 overflow-y-auto pr-2 pb-24">
+                        <EditorView />
+                    </div>
+                    <div className="lg:col-span-1 h-full">
+                        <TiltCardPreview template={template} fields={fields} name={name} title={title} />
+                    </div>
+                    <div className="lg:col-span-1 h-full">
+                        <GemSidebar onAIPolish={handleAIPolish} />
+                    </div>
+                </div>
 
-                <AIPolishButton onClick={handleAIPolish} />
+                {/* Mobile Layout */}
+                <div className="lg:hidden flex-grow overflow-y-auto pb-24">
+                    <div className={`${mobileTab === 'editor' ? 'space-y-8' : 'hidden'}`}>
+                        <EditorView />
+                        <GemSidebar onAIPolish={handleAIPolish} />
+                    </div>
+                    <div className={`${mobileTab === 'preview' ? 'h-full' : 'hidden'}`}>
+                        <TiltCardPreview template={template} fields={fields} name={name} title={title} />
+                    </div>
+                </div>
             </div>
-            
+
             <ShareModal 
                 isOpen={isShareModalOpen}
                 onClose={() => setIsShareModalOpen(false)}
                 fields={fields}
                 template={template}
+                onPreviewLink={() => {
+                    setIsShareModalOpen(false);
+                    setIsPreviewing(true);
+                }}
             />
-        </div>
+        </>
     );
 };
 

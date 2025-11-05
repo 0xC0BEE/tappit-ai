@@ -1,4 +1,6 @@
+
 import React, { useRef, useEffect, useState } from 'react';
+import { springTransition } from '../utils/spring.ts';
 
 const useTilt = (options = { max: 15, perspective: 1000, scale: 1.05 }) => {
     const ref = useRef<HTMLDivElement>(null);
@@ -25,7 +27,7 @@ const useTilt = (options = { max: 15, perspective: 1000, scale: 1.05 }) => {
         const handleMouseLeave = () => {
             setStyle({
                 transform: `perspective(${options.perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`,
-                transition: 'transform 0.4s ease-in-out'
+                ...springTransition
             });
         };
 
@@ -34,6 +36,7 @@ const useTilt = (options = { max: 15, perspective: 1000, scale: 1.05 }) => {
 
         return () => {
             element.removeEventListener('mousemove', handleMouseMove);
+            // Fix: Pass the handler function `handleMouseLeave` instead of the string 'mouseleave'.
             element.removeEventListener('mouseleave', handleMouseLeave);
         };
     }, [options.max, options.perspective, options.scale]);

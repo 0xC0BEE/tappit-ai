@@ -1,30 +1,35 @@
+
 import React from 'react';
-// Fix: Add file extension to satisfy bundler/type checker.
+import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import { CardIcon, ShareIcon } from '../icons.tsx';
+import { CardIcon, UploadIcon } from '../icons.tsx';
 
 interface BulkActionsProps {
-    selectedCount: number;
+    onAssignCard: () => void;
+    onExportData: () => void;
 }
 
-const BulkActions: React.FC<BulkActionsProps> = ({ selectedCount }) => {
-    if (selectedCount === 0) return null;
-
+const BulkActions: React.FC<BulkActionsProps> = ({ onAssignCard, onExportData }) => {
     return (
-        <div className="bg-bamboo-8/30 backdrop-blur-md border border-bamboo-7/50 rounded-xl p-4 flex items-center justify-between animate-fadeIn">
-            <span className="font-semibold text-white">{selectedCount} member{selectedCount > 1 ? 's' : ''} selected</span>
-            <div className="flex items-center space-x-2">
-                <HapticButton className="bg-white/10 text-white text-sm font-semibold py-2 px-4 rounded-full flex items-center space-x-2">
-                    <CardIcon className="w-4 h-4" />
-                    <span>Assign Card</span>
+        <GlassCard className="p-4">
+            <h2 className="text-xl font-bold text-white mb-4">Bulk Actions</h2>
+            <div className="space-y-3">
+                <HapticButton 
+                    onClick={onAssignCard}
+                    className="w-full flex items-center justify-center space-x-2 bg-white/10 text-white font-semibold py-2 rounded-lg hover:bg-white/20"
+                >
+                    <CardIcon className="w-5 h-5" />
+                    <span>Assign Card Template</span>
                 </HapticButton>
-                <HapticButton className="bg-white/10 text-white text-sm font-semibold py-2 px-4 rounded-full flex items-center space-x-2">
-                    <ShareIcon className="w-4 h-4" />
-                    <span>Export</span>
+                <HapticButton 
+                    onClick={onExportData}
+                    className="w-full flex items-center justify-center space-x-2 bg-white/10 text-white font-semibold py-2 rounded-lg hover:bg-white/20"
+                >
+                    <UploadIcon className="w-5 h-5 -rotate-90" />
+                    <span>Export Team Data</span>
                 </HapticButton>
             </div>
-        </div>
+        </GlassCard>
     );
 };
 

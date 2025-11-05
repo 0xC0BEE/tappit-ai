@@ -1,5 +1,4 @@
-import React, { ReactNode } from 'react';
-import ReactDOM from 'react-dom';
+import React, { ReactNode, useEffect } from 'react';
 
 interface ModalProps {
     isOpen: boolean;
@@ -8,21 +7,35 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
-    if (!isOpen) return null;
+    useEffect(() => {
+        const handleEsc = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
 
-    return ReactDOM.createPortal(
+        return () => {
+            window.removeEventListener('keydown', handleEsc);
+        };
+    }, [onClose]);
+
+    if (!isOpen) {
+        return null;
+    }
+
+    return (
         <div 
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md animate-fadeIn"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn"
             onClick={onClose}
         >
-            <div
-                className="animate-scaleIn"
-                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal content
+            <div 
+                className="relative animate-scaleIn"
+                onClick={(e) => e.stopPropagation()} // Prevent closing modal when clicking on its content
             >
                 {children}
             </div>
-        </div>,
-        document.body
+        </div>
     );
 };
 

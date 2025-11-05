@@ -1,32 +1,26 @@
-// Fix: Import React to make its types available for global declarations.
 import React from 'react';
 
-// Add global declarations for third-party libraries to satisfy the type checker.
-declare global {
-    namespace JSX {
-        interface IntrinsicElements {
-            'lottie-player': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
-                src?: string;
-                background?: string;
-                speed?: string;
-                loop?: boolean;
-                autoplay?: boolean;
-            };
-        }
-    }
-    interface Window {
-        // Assuming confetti.js is loaded from a CDN
-        confetti: (opts: any) => void;
-    }
-}
-
-
+// From App.tsx
 export enum Tab {
     Home = 'Home',
     Cards = 'Cards',
     Network = 'Network',
     AI = 'AI',
     Team = 'Team',
+}
+
+// From CardBuilderScreen.tsx and related components
+export enum FieldType {
+    Text = 'text',
+    Video = 'video',
+}
+
+export interface CardField {
+    id: string;
+    label: string;
+    value: string;
+    icon: React.FC<{ className?: string }>;
+    fieldType: FieldType;
 }
 
 export interface CardTemplate {
@@ -36,28 +30,14 @@ export interface CardTemplate {
     textColor: string;
 }
 
-export enum FieldType {
-    Text = 'text',
-    Email = 'email',
-    URL = 'url',
-    Phone = 'tel',
-}
-
-export interface CardField {
-    id: string;
-    label: string;
-    value: string;
-    placeholder: string;
-    type: FieldType;
-}
-
+// From NetworkScreen.tsx and related components
 export enum InteractionType {
     Tap = 'Tap',
-    GPSTap = 'GPS Tap',
-    Email = 'Email',
-    Call = 'Call',
     Meeting = 'Meeting',
+    Call = 'Call',
+    Email = 'Email',
     Note = 'Note',
+    GPSTap = 'GPS Tap',
     TreePlanted = 'Tree Planted',
 }
 
@@ -81,19 +61,38 @@ export interface Contact {
     interactions: Interaction[];
 }
 
+// From GemSidebar.tsx and gems
+export interface GemDefinition {
+    id: string;
+    name: string;
+    description: string;
+    component: React.FC<any>;
+    isCustom?: boolean;
+    customComponentStr?: string;
+}
+
+// From gems/CustomGemComponent.tsx
+export interface CustomGemComponentProps {
+    jsxString?: string;
+}
+
+// From TeamScreen.tsx and related components
 export interface TeamMember {
     id: string;
     name: string;
-    role: string;
     avatarUrl: string;
+    role: string;
     taps: number;
     connections: number;
-    lastActive: string;
+    leadScore: number;
 }
 
 export interface TeamActivity {
     id: string;
-    member: TeamMember;
+    member: {
+        name: string;
+        avatarUrl: string;
+    };
     action: string;
     target: string;
     timestamp: string;
@@ -102,15 +101,15 @@ export interface TeamActivity {
 export interface BrandKit {
     logoUrl: string;
     primaryColor: string;
-    secondaryColor: string;
     font: string;
 }
 
+// From AnalyticsScreen.tsx and data/analytics.ts
 export interface AnalyticsData {
-    taps: { current: number; previous: number; };
-    connections: { current: number; previous: number; };
-    leadScore: { current: number; previous: number; };
-    carbonSaved: { current: number; previous: number; };
+    taps: { current: number; previous: number };
+    connections: { current: number; previous: number };
+    leadScore: { current: number; previous: number };
+    carbonSaved: { current: number; previous: number };
     tapLocations: { lat: number; lng: number; count: number }[];
     performance: { name: string; taps: number }[];
 }

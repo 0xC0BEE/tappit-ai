@@ -1,50 +1,99 @@
 import React, { useState } from 'react';
-// Fix: Add file extension to satisfy bundler/type checker.
-import { contacts } from '../data/contacts.ts';
-// Fix: Add file extension to satisfy bundler/type checker.
+import { Contact, Interaction } from '../types.ts';
+import { contacts as initialContacts } from '../data/contacts.ts';
 import ContactCard from '../components/ContactCard.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import { Contact } from '../types.ts';
+import GlassCard from '../components/GlassCard.tsx';
+import MemoryLaneTimeline from '../components/MemoryLaneTimeline.tsx';
+import HapticButton from '../components/HapticButton.tsx';
+import AddInteractionModal from '../components/modals/AddInteractionModal.tsx';
+import { PlusIcon } from '../components/icons.tsx';
 
-const NetworkScreen: React.FC = () => {
-    const [searchTerm, setSearchTerm] = useState('');
+interface NetworkScreenProps {
+    onOpenFeedback: () => void;
+}
 
-    const filteredContacts = contacts.filter(contact => 
-        contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contact.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+const NetworkScreen: React.FC<NetworkScreenProps> = ({ onOpenFeedback }) => {
+    const [contacts, setContacts] = useState<Contact[]>(initialContacts);
+    const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+    const [isInteractionModalOpen, setInteractionModalOpen] = useState(false);
+
+    const handleSelectContact = (contact: Contact) => {
+        setSelectedContact(contact);
+    };
+
+    const handleAddInteraction = (interaction: Interaction) => {
+        if (!selectedContact) return;
+
+        const updatedContact: Contact = {
+            ...selectedContact,
+            interactions: [interaction, ...selectedContact.interactions],
+            lastInteraction: 'Just now',
+        };
+
+        setContacts(prevContacts =>
+            prevContacts.map(c => c.id === updatedContact.id ? updatedContact : c)
+        );
+        setSelectedContact(updatedContact);
+    };
+
+    if (selectedContact) {
+        return (
+            <>
+                <div className="animate-scaleIn h-full flex flex-col gap-8">
+                    <header className="flex items-start justify-between">
+                        <div className="flex items-center space-x-4">
+                            <HapticButton onClick={() => setSelectedContact(null)} className="bg-white/10 text-white p-3 rounded-full hover:bg-white/20">
+                                &larr;
+                            </HapticButton>
+                            <img src={selectedContact.photoUrl} alt={selectedContact.name} className="w-16 h-16 rounded-full" />
+                            <div>
+                                <h1 className="text-4xl font-bold text-white">{selectedContact.name}</h1>
+                                <p className="text-gray-300 text-lg mt-1">{selectedContact.title} at {selectedContact.company}</p>
+                            </div>
+                        </div>
+                        <HapticButton 
+                            onClick={() => setInteractionModalOpen(true)}
+                            className="flex items-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-4 rounded-full shadow-lg shadow-bamboo-8/30"
+                        >
+                            <PlusIcon className="w-5 h-5" />
+                            <span>Log</span>
+                        </HapticButton>
+                    </header>
+                    <GlassCard className="p-4 flex-grow overflow-y-auto pb-24">
+                        <h2 className="text-xl font-bold text-white mb-4 px-2">Memory Lane</h2>
+                        <MemoryLaneTimeline interactions={selectedContact.interactions} />
+                    </GlassCard>
+                </div>
+                <AddInteractionModal
+                    isOpen={isInteractionModalOpen}
+                    onClose={() => setInteractionModalOpen(false)}
+                    onAddInteraction={handleAddInteraction}
+                    contactName={selectedContact.name}
+                />
+            </>
+        );
+    }
 
     return (
-        <div className="animate-scaleIn h-full flex flex-col">
-            <header className="flex-shrink-0">
+        <div className="animate-scaleIn h-full flex flex-col gap-8">
+            <header>
                 <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7">
                     Network
                 </h1>
-                <p className="text-gray-300 text-lg mt-2">Manage your connections.</p>
+                <p className="text-gray-300 text-lg mt-2">Your connections, supercharged.</p>
             </header>
-            
-            <div className="my-6 flex-shrink-0">
-                <input
-                    type="text"
-                    placeholder="Search by name, company, title..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-white/10 text-white placeholder-gray-400 rounded-full py-3 px-6 border-2 border-transparent focus:border-bamboo-8 focus:ring-0 focus:outline-none transition-colors"
-                />
+            <div className="flex-grow overflow-y-auto pr-2 pb-24 space-y-4">
+                {contacts.map(contact => (
+                    <ContactCard 
+                        key={contact.id} 
+                        contact={contact} 
+                        onClick={() => handleSelectContact(contact)}
+                    />
+                ))}
             </div>
-            
-            <div className="flex-grow overflow-y-auto space-y-4 -mx-6 px-6">
-                {filteredContacts.length > 0 ? (
-                    filteredContacts.map(contact => (
-                        <ContactCard key={contact.id} contact={contact} />
-                    ))
-                ) : (
-                    <div className="text-center py-10">
-                        <p className="text-gray-400">No contacts found.</p>
-                    </div>
-                )}
-            </div>
+             <HapticButton onClick={onOpenFeedback} className="fixed bottom-24 right-8 bg-bamboo-8 text-white p-4 rounded-full shadow-lg shadow-bamboo-8/40 z-20">
+                <span role="img" aria-label="feedback">💡</span>
+            </HapticButton>
         </div>
     );
 };

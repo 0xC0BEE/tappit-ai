@@ -1,86 +1,73 @@
-import React, { useState, useCallback } from 'react';
-// Fix: Add file extension to satisfy bundler/type checker.
+import React, { useState, useEffect } from 'react';
 import { Tab } from './types.ts';
-// Fix: Add file extension to satisfy bundler/type checker.
-import BambooBackground from './components/BambooBackground.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import BottomNavBar from './components/BottomNavBar.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import OnboardingScreen from './screens/OnboardingScreen.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import HomeScreen from './screens/HomeScreen.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import CardBuilderScreen from './screens/CardBuilderScreen.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import NetworkScreen from './screens/NetworkScreen.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import TeamScreen from './screens/TeamScreen.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import PlaceholderScreen from './screens/PlaceholderScreen.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import PlantTreeCertificate from './components/delight/PlantTreeCertificate.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
 import { useTheme } from './hooks/useTheme.ts';
+
+// Components
+import BambooBackground from './components/BambooBackground.tsx';
+import BottomNavBar from './components/BottomNavBar.tsx';
+import ShakeToReportButton from './components/feedback/ShakeToReportButton.tsx';
+import FeedbackModal from './components/feedback/FeedbackModal.tsx';
+
+// Screens
+import OnboardingScreen from './screens/OnboardingScreen.tsx';
+import HomeScreen from './screens/HomeScreen.tsx';
+import CardBuilderScreen from './screens/CardBuilderScreen.tsx';
+import NetworkScreen from './screens/NetworkScreen.tsx';
+import TeamScreen from './screens/TeamScreen.tsx';
+import AnalyticsScreen from './screens/AnalyticsScreen.tsx';
 
 const App: React.FC = () => {
     useTheme();
     const [isOnboarding, setIsOnboarding] = useState(true);
     const [activeTab, setActiveTab] = useState<Tab>(Tab.Home);
-    const [greenStreak, setGreenStreak] = useState(3);
-    const [isCertificateOpen, setIsCertificateOpen] = useState(false);
+    const [isFeedbackModalOpen, setFeedbackModalOpen] = useState(false);
 
     const handleOnboardingComplete = () => {
+        localStorage.setItem('hasOnboarded', 'true'); // Persist onboarding status
         setIsOnboarding(false);
     };
 
-    const handleStreakComplete = useCallback(() => {
-        setGreenStreak(0);
-        setIsCertificateOpen(true);
+    // Check if user has already onboarded
+    useEffect(() => {
+        if (localStorage.getItem('hasOnboarded') === 'true') {
+            setIsOnboarding(false);
+        }
     }, []);
 
-    const renderContent = () => {
-        if (isOnboarding) {
-            return <OnboardingScreen onComplete={handleOnboardingComplete} />;
-        }
-        
+    const renderActiveScreen = () => {
         switch (activeTab) {
             case Tab.Home:
-                return <HomeScreen 
-                    greenStreak={greenStreak} 
-                    setGreenStreak={setGreenStreak}
-                    onStreakComplete={handleStreakComplete} 
-                />;
+                return <HomeScreen />;
             case Tab.Cards:
                 return <CardBuilderScreen />;
             case Tab.Network:
-                return <NetworkScreen />;
-            case Tab.AI:
-                 return <PlaceholderScreen title="AI Insights" />;
+                return <NetworkScreen onOpenFeedback={() => setFeedbackModalOpen(true)} />;
             case Tab.Team:
                 return <TeamScreen />;
+            case Tab.AI:
+                return <AnalyticsScreen />; // Fix: Was PlaceholderScreen
             default:
-                return <HomeScreen 
-                    greenStreak={greenStreak} 
-                    setGreenStreak={setGreenStreak} 
-                    onStreakComplete={handleStreakComplete}
-                />;
+                return <HomeScreen />;
         }
     };
 
     return (
-        <main className="h-screen w-screen bg-bamboo-12 text-white font-sans overflow-hidden flex flex-col">
-            <BambooBackground />
-            <div className="flex-grow p-6 lg:p-8 overflow-y-auto">
-                {renderContent()}
+        <ShakeToReportButton>
+            <div className="bg-bamboo-12 text-white font-sans min-h-screen">
+                <BambooBackground />
+                <main className="relative z-10 h-screen p-8">
+                    {isOnboarding ? (
+                        <OnboardingScreen onComplete={handleOnboardingComplete} />
+                    ) : (
+                        renderActiveScreen()
+                    )}
+                </main>
+                {!isOnboarding && (
+                    <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
+                )}
+                <FeedbackModal isOpen={isFeedbackModalOpen} onClose={() => setFeedbackModalOpen(false)} />
             </div>
-            {!isOnboarding && (
-                <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
-            )}
-            <PlantTreeCertificate 
-                isOpen={isCertificateOpen} 
-                onClose={() => setIsCertificateOpen(false)}
-            />
-        </main>
+        </ShakeToReportButton>
     );
 };
 

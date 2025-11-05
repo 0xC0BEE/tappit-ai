@@ -5,6 +5,13 @@ import { CertificateIcon, CloseIcon, ShareIcon, TreeIcon } from '../icons.tsx';
 import HapticButton from '../HapticButton.tsx';
 import { useHaptics, HapticPattern } from '../../hooks/useHaptics.ts';
 
+// Fix: Add confetti to the Window interface to fix TypeScript error.
+declare global {
+    interface Window {
+        confetti?: (options: any) => void;
+    }
+}
+
 interface PlantTreeCertificateProps {
     isOpen: boolean;
     onClose: () => void;
@@ -26,7 +33,25 @@ const PlantTreeCertificate: React.FC<PlantTreeCertificateProps> = ({ isOpen, onC
                 });
             }
         }
-    }, [isOpen]);
+    }, [isOpen, playHaptic]);
+
+    const handleShare = async () => {
+        const shareData = {
+            title: 'I Planted a Tree with Tappit AI!',
+            text: "Thanks to my 7-day connection streak on Tappit AI, a real tree was planted. Join me in making a positive impact!",
+            url: 'https://tappit.ai/green',
+        };
+        try {
+            if (navigator.share) {
+                await navigator.share(shareData);
+            } else {
+                alert("Sharing your impact! (Web Share API not supported)");
+            }
+        } catch (err) {
+            console.error('Error sharing:', err);
+            alert("Could not share at this time.");
+        }
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -51,7 +76,9 @@ const PlantTreeCertificate: React.FC<PlantTreeCertificateProps> = ({ isOpen, onC
                     <p className="text-xl font-semibold text-bamboo-7">Tappit AI Green User</p>
                 </div>
                 
-                <HapticButton className="w-full flex items-center justify-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors">
+                <HapticButton 
+                    onClick={handleShare}
+                    className="w-full flex items-center justify-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors">
                     <ShareIcon className="w-5 h-5" />
                     <span>Share Your Impact</span>
                 </HapticButton>

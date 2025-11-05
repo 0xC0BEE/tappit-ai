@@ -1,6 +1,6 @@
 import React from 'react';
-// Fix: Add file extension to satisfy bundler/type checker.
 import { CardTemplate } from '../types.ts';
+import { springTransitionAll } from '../utils/spring.ts';
 
 interface TemplateCarouselProps {
     templates: CardTemplate[];
@@ -17,7 +17,8 @@ const TemplateCarousel: React.FC<TemplateCarouselProps> = ({ templates, selected
                     <button
                         key={template.id}
                         onClick={() => onSelectTemplate(template)}
-                        className={`w-20 h-28 rounded-xl flex-shrink-0 transition-all duration-300 transform hover:scale-105 ${template.className} ${selectedTemplate.id === template.id ? 'ring-4 ring-bamboo-8 ring-offset-2 ring-offset-bamboo-12' : 'ring-2 ring-white/20'}`}
+                        style={springTransitionAll}
+                        className={`w-20 h-28 rounded-xl flex-shrink-0 transform hover:scale-105 ${template.className} ${selectedTemplate.id === template.id ? 'ring-4 ring-bamboo-8 ring-offset-2 ring-offset-bamboo-12' : 'ring-2 ring-white/20'}`}
                     >
                         <div className="flex items-center justify-center h-full">
                              <span className={`text-xs font-bold ${template.textColor}`}>{template.name}</span>

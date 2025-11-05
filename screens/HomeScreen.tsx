@@ -1,63 +1,115 @@
-import React from 'react';
-import GlassCard from '../components/GlassCard.tsx';
+
+import React, { useState } from 'react';
 import GreenStreakTracker from '../components/delight/GreenStreakTracker.tsx';
 import LockScreenWidgetSimulation from '../components/delight/LockScreenWidgetSimulation.tsx';
 import ReferralCard from '../components/delight/ReferralCard.tsx';
+import PlantTreeCertificate from '../components/delight/PlantTreeCertificate.tsx';
+import GlassCard from '../components/GlassCard.tsx';
+import HapticButton from '../components/HapticButton.tsx';
+import { QRIcon, CardIcon, WandIcon } from '../components/icons.tsx';
+import CameraScanModal from '../components/modals/CameraScanModal.tsx';
+import MyQRModal from '../components/modals/MyQRModal.tsx';
 
-interface HomeScreenProps {
-    greenStreak: number;
-    setGreenStreak: React.Dispatch<React.SetStateAction<number>>;
-    onStreakComplete: () => void;
-}
-
-const HomeScreen: React.FC<HomeScreenProps> = ({ greenStreak, setGreenStreak, onStreakComplete }) => {
+// New Quick Actions Card Component
+const QuickActionsCard: React.FC<{
+    onScan: () => void;
+    onMyQR: () => void;
+    onAINudge: () => void;
+}> = ({ onScan, onMyQR, onAINudge }) => {
     return (
-        <div className="animate-scaleIn space-y-8">
-            <header>
-                <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7">
-                    Welcome Back
-                </h1>
-                <p className="text-gray-300 text-lg mt-2">Let's make a positive impact today.</p>
-            </header>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="space-y-8">
-                    <GreenStreakTracker 
-                        streak={greenStreak}
-                        setStreak={setGreenStreak}
-                        onStreakComplete={onStreakComplete}
-                    />
-                    <ReferralCard />
-                </div>
-                <div className="space-y-8">
-                    <LockScreenWidgetSimulation />
-                     <GlassCard className="p-6">
-                        <h2 className="text-2xl font-bold mb-4 text-white">Recent Connections</h2>
-                        <ul className="space-y-4">
-                            <ContactItem name="Jane Doe" event="at TechCrunch 2024" />
-                            <ContactItem name="John Smith" event="via LinkedIn" />
-                            <ContactItem name="Alex Ray" event="at Founders Meetup" />
-                        </ul>
-                    </GlassCard>
-                </div>
+        <GlassCard className="p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">Quick Actions</h2>
+            <div className="space-y-3">
+                <HapticButton
+                    onClick={onScan}
+                    className="w-full flex items-center space-x-3 text-left p-4 bg-white/5 rounded-lg hover:bg-white/10"
+                >
+                    <QRIcon className="w-7 h-7 text-bamboo-7" />
+                    <div>
+                        <p className="font-bold text-white">Scan</p>
+                        <p className="text-sm text-gray-400">Scan another Tappit card</p>
+                    </div>
+                </HapticButton>
+                <HapticButton
+                    onClick={onMyQR}
+                    className="w-full flex items-center space-x-3 text-left p-4 bg-white/5 rounded-lg hover:bg-white/10"
+                >
+                    <CardIcon className="w-7 h-7 text-bamboo-7" />
+                    <div>
+                        <p className="font-bold text-white">My QR Code</p>
+                        <p className="text-sm text-gray-400">Share your card instantly</p>
+                    </div>
+                </HapticButton>
+                <HapticButton
+                    onClick={onAINudge}
+                    className="w-full flex items-center space-x-3 text-left p-4 bg-white/5 rounded-lg hover:bg-white/10"
+                >
+                    <WandIcon className="w-7 h-7 text-bamboo-7" />
+                    <div>
+                        <p className="font-bold text-white">AI Nudge</p>
+                        <p className="text-sm text-gray-400">Get a smart follow-up idea</p>
+                    </div>
+                </HapticButton>
             </div>
-        </div>
+        </GlassCard>
     );
 };
 
 
-interface ContactItemProps {
-    name: string;
-    event: string;
-}
-const ContactItem: React.FC<ContactItemProps> = ({ name, event }) => (
-    <li className="flex items-center space-x-4">
-        <img src={`https://picsum.photos/seed/${name}/40/40`} alt={name} className="w-10 h-10 rounded-full" />
-        <div>
-            <p className="font-semibold text-white">{name}</p>
-            <p className="text-sm text-gray-400">{event}</p>
-        </div>
-    </li>
-);
+const HomeScreen: React.FC = () => {
+    const [streak, setStreak] = useState(3);
+    const [isCertificateOpen, setCertificateOpen] = useState(false);
+    const [isCameraScanModalOpen, setCameraScanModalOpen] = useState(false);
+    const [isMyQRModalOpen, setIsMyQRModalOpen] = useState(false);
+
+    const handleStreakComplete = () => {
+        setStreak(0); // Reset streak
+        setCertificateOpen(true); // Show certificate
+    };
+
+    return (
+        <>
+            <div className="animate-scaleIn h-full flex flex-col gap-8">
+                <header>
+                    <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7">
+                        Welcome Back
+                    </h1>
+                    <p className="text-gray-300 text-lg mt-2">Here's what's new for you.</p>
+                </header>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-grow overflow-y-auto pr-2 pb-24">
+                    <div className="space-y-8">
+                        <GreenStreakTracker 
+                            streak={streak} 
+                            setStreak={setStreak} 
+                            onStreakComplete={handleStreakComplete} 
+                        />
+                        <ReferralCard />
+                    </div>
+                    <div className="space-y-8">
+                        <LockScreenWidgetSimulation />
+                        <QuickActionsCard 
+                            onScan={() => setCameraScanModalOpen(true)}
+                            onMyQR={() => setIsMyQRModalOpen(true)}
+                            onAINudge={() => alert('AI Nudge feature coming soon!')}
+                        />
+                    </div>
+                </div>
+            </div>
+            <PlantTreeCertificate 
+                isOpen={isCertificateOpen}
+                onClose={() => setCertificateOpen(false)}
+            />
+            <CameraScanModal
+                isOpen={isCameraScanModalOpen}
+                onClose={() => setCameraScanModalOpen(false)}
+            />
+            <MyQRModal
+                isOpen={isMyQRModalOpen}
+                onClose={() => setIsMyQRModalOpen(false)}
+            />
+        </>
+    );
+};
 
 export default HomeScreen;

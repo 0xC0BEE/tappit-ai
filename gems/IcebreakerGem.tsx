@@ -1,10 +1,49 @@
-import React from 'react';
-import GemWrapper from './GemWrapper.tsx';
+import React, { useState } from 'react';
+import { GoogleGenAI } from "@google/genai";
+import HapticButton from '../components/HapticButton.tsx';
 
-const IcebreakerGem: React.FC = () => (
-    <GemWrapper title="Icebreaker Suggestions" description="AI-powered conversation starters for your new contact.">
-        <p className="text-gray-300">"I saw you're into rock climbing, what's the best spot you've been to?"</p>
-    </GemWrapper>
-);
+const IcebreakerGem: React.FC = () => {
+    const [icebreaker, setIcebreaker] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleGenerate = async () => {
+        setIsLoading(true);
+        setIcebreaker('');
+        try {
+            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: "Suggest a fun, professional icebreaker question for a digital business card.",
+                config: {
+                    systemInstruction: "You suggest short, engaging icebreaker questions. Return only the question.",
+                }
+            });
+            setIcebreaker(response.text.trim());
+        } catch (error) {
+            console.error("Failed to generate icebreaker:", error);
+            setIcebreaker("Could not generate an icebreaker. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div>
+            <p className="text-sm text-gray-300 mb-2">Generate a fun fact or question to add to your card.</p>
+            <HapticButton 
+                onClick={handleGenerate}
+                disabled={isLoading}
+                className="w-full bg-white/10 text-white font-semibold py-2 rounded-lg text-sm disabled:opacity-50"
+            >
+                {isLoading ? 'Generating...' : 'Suggest Icebreaker'}
+            </HapticButton>
+            {icebreaker && (
+                <div className="mt-3 p-2 bg-black/20 rounded-md text-sm text-bamboo-7 animate-fadeIn">
+                    <p>{icebreaker}</p>
+                </div>
+            )}
+        </div>
+    );
+};
 
 export default IcebreakerGem;
