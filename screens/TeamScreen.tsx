@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { teamMembers as initialMembers, teamActivities, brandKit as initialBrandKit } from '../data/team.ts';
-import { TeamMember, BrandKit } from '../types.ts';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../services/supabase.ts';
+import { TeamMember, BrandKit, TeamActivity } from '../types.ts';
 import TeamMemberDetail from '../components/team/TeamMemberDetail.tsx';
 import AITeamInsights from '../components/team/AITeamInsights.tsx';
 import ActivityFeed from '../components/team/ActivityFeed.tsx';
@@ -8,14 +8,47 @@ import InviteTeamModal from '../components/modals/InviteTeamModal.tsx';
 import CustomizeTeamModal from '../components/modals/CustomizeTeamModal.tsx';
 import HapticButton from '../components/HapticButton.tsx';
 import { PlusIcon, WandIcon } from '../components/icons.tsx';
+import LoadingSkeleton from '../components/LoadingSkeleton.tsx';
 
 const TeamScreen: React.FC = () => {
-    const [members, setMembers] = useState<TeamMember[]>(initialMembers);
-    const [brandKit, setBrandKit] = useState<BrandKit>(initialBrandKit);
+    const [members, setMembers] = useState<TeamMember[]>([]);
+    const [brandKit, setBrandKit] = useState<BrandKit | null>(null);
+    const [activities, setActivities] = useState<TeamActivity[]>([]);
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+    const [loading, setLoading] = useState(true);
     
     const [isInviteModalOpen, setInviteModalOpen] = useState(false);
     const [isCustomizeModalOpen, setCustomizeModalOpen] = useState(false);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            // Fix: Correctly await the mock Supabase query builder chains.
+            const { data: membersData, error: membersError } = await supabase.from('team_members').select('*');
+            const { data: brandKitData, error: brandKitError } = await supabase.from('brand_kit').select('*').single();
+            const { data: activitiesData, error: activitiesError } = await supabase.from('team_activities').select('*').limit(5);
+
+            if (membersError || brandKitError || activitiesError) {
+                console.error(membersError || brandKitError || activitiesError);
+            } else {
+                setMembers(membersData as TeamMember[]);
+                setBrandKit(brandKitData as BrandKit);
+                setActivities(activitiesData as TeamActivity[]);
+            }
+            setLoading(false);
+        };
+        fetchData();
+    }, []);
+
+    const handleUpdateBrandKit = async (newBrandKit: BrandKit) => {
+        setBrandKit(newBrandKit);
+        // Fix: Correctly await the mock Supabase query builder chain.
+        const { error } = await supabase.from('brand_kit').update(newBrandKit).eq('id', newBrandKit.id);
+        if (error) {
+            console.error('Failed to update brand kit', error);
+            // Optionally revert state
+        }
+    };
 
     const handleSelectMember = (member: TeamMember) => {
         setSelectedMember(member);
@@ -23,6 +56,10 @@ const TeamScreen: React.FC = () => {
 
     if (selectedMember) {
         return <TeamMemberDetail member={selectedMember} onBack={() => setSelectedMember(null)} />;
+    }
+
+    if (loading || !brandKit) {
+        return <div className="flex flex-col gap-4 p-4">{Array.from({length: 5}).map((_, i) => <LoadingSkeleton key={i}/>)}</div>
     }
 
     return (
@@ -55,7 +92,6 @@ const TeamScreen: React.FC = () => {
                         </div>
                     </header>
                     
-                    {/* Member List */}
                     <div className="space-y-3">
                         {members.map(member => (
                              <HapticButton key={member.id} onClick={() => handleSelectMember(member)} className="w-full text-left">
@@ -75,10 +111,9 @@ const TeamScreen: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Right column: Insights & Feed */}
                 <div className="lg:col-span-1 h-full flex flex-col gap-6 overflow-y-auto pr-2 pb-24">
                     <AITeamInsights />
-                    <ActivityFeed activities={teamActivities} />
+                    <ActivityFeed activities={activities} />
                 </div>
             </div>
             
@@ -87,7 +122,7 @@ const TeamScreen: React.FC = () => {
                 isOpen={isCustomizeModalOpen} 
                 onClose={() => setCustomizeModalOpen(false)}
                 brandKit={brandKit}
-                setBrandKit={setBrandKit}
+                setBrandKit={handleUpdateBrandKit}
                 teamMembers={members}
             />
         </>

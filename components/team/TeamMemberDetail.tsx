@@ -1,9 +1,10 @@
-import React from 'react';
-import { TeamMember } from '../../types.ts';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../services/supabase.ts';
+import { TeamMember, Contact } from '../../types.ts';
 import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
 import { ZapIcon, NetworkIcon, TrendingUpIcon } from '../icons.tsx';
-import { contacts } from '../../data/contacts.ts'; // Using mock contacts for connections
+import LoadingSkeleton from '../LoadingSkeleton.tsx';
 
 interface TeamMemberDetailProps {
     member: TeamMember;
@@ -11,8 +12,29 @@ interface TeamMemberDetailProps {
 }
 
 const TeamMemberDetail: React.FC<TeamMemberDetailProps> = ({ member, onBack }) => {
-    // Simulate this member's connections by taking a slice of the mock contacts
-    const memberConnections = contacts.slice(0, 3);
+    const [connections, setConnections] = useState<Contact[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchConnections = async () => {
+            setLoading(true);
+            // In a real schema, you'd likely filter contacts by team_member_id
+            // For now, we'll fetch a few contacts to simulate.
+            // Fix: Correctly await the mock Supabase query builder chain.
+            const { data, error } = await supabase
+                .from('contacts')
+                .select('*')
+                .limit(3);
+            
+            if (error) {
+                console.error("Error fetching connections for team member:", error);
+            } else {
+                setConnections(data as Contact[]);
+            }
+            setLoading(false);
+        };
+        fetchConnections();
+    }, [member.id]);
 
     return (
         <div className="animate-scaleIn h-full flex flex-col gap-8">
@@ -45,19 +67,23 @@ const TeamMemberDetail: React.FC<TeamMemberDetailProps> = ({ member, onBack }) =
                     <GlassCard className="p-6 h-full flex flex-col">
                         <h2 className="text-2xl font-bold text-white mb-4">Recent Connections</h2>
                         <div className="flex-grow overflow-y-auto space-y-3">
-                            {memberConnections.map(contact => (
-                                <div key={contact.id} className="bg-black/20 p-3 rounded-lg w-full flex items-center space-x-4">
-                                    <img src={contact.photoUrl} alt={contact.name} className="w-12 h-12 rounded-full" />
-                                    <div className="flex-grow">
-                                        <p className="font-bold text-white">{contact.name}</p>
-                                        <p className="text-sm text-gray-300">{contact.title}</p>
+                            {loading ? (
+                                Array.from({length: 3}).map((_, i) => <LoadingSkeleton key={i}/>)
+                            ) : (
+                                connections.map(contact => (
+                                    <div key={contact.id} className="bg-black/20 p-3 rounded-lg w-full flex items-center space-x-4">
+                                        <img src={contact.photoUrl} alt={contact.name} className="w-12 h-12 rounded-full" />
+                                        <div className="flex-grow">
+                                            <p className="font-bold text-white">{contact.name}</p>
+                                            <p className="text-sm text-gray-300">{contact.title}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xs text-gray-400">Lead Score</p>
+                                            <p className="font-semibold text-white">{contact.leadScore}</p>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-xs text-gray-400">Lead Score</p>
-                                        <p className="font-semibold text-white">{contact.leadScore}</p>
-                                    </div>
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </div>
                     </GlassCard>
                 </div>

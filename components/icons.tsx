@@ -2,7 +2,6 @@ import React from 'react';
 
 type IconProps = {
     className?: string;
-    // Fix: Add style prop to allow inline styles, which is used for spring animations.
     style?: React.CSSProperties;
 };
 
@@ -43,3 +42,4 @@ export const CertificateIcon = createIcon(<path strokeLinecap="round" strokeLine
 export const GiftIcon = createIcon(<path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />);
 export const TrendingUpIcon = createIcon(<path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />);
 export const QRIcon = createIcon(<path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />);
+export const ShoppingCartIcon = createIcon(<path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />);

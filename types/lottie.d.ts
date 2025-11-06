@@ -1,4 +1,4 @@
-// Fix: The contents of this file have been moved to components/LottiePlayer.tsx
-// to resolve module augmentation issues and make the component self-contained.
-// This file is now empty and can be removed in the future.
-export {};
+// This file is intentionally left empty.
+// The type definitions for the <lottie-player> custom element have been moved
+// to `components/LottiePlayer.tsx` to resolve a build issue where this global
+// declaration file was not being recognized by the TypeScript compiler.

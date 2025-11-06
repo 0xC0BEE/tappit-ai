@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tab } from '../types.ts';
 import HapticButton from './HapticButton.tsx';
-import { HomeIcon, CardIcon, NetworkIcon, AIIcon, TeamIcon } from './icons.tsx';
+import { HomeIcon, CardIcon, NetworkIcon, ShoppingCartIcon, TeamIcon } from './icons.tsx';
 import { springTransition } from '../utils/spring.ts';
 
 interface BottomNavBarProps {
@@ -13,7 +13,7 @@ const navItems = [
     { tab: Tab.Home, Icon: HomeIcon },
     { tab: Tab.Cards, Icon: CardIcon },
     { tab: Tab.Network, Icon: NetworkIcon },
-    { tab: Tab.AI, Icon: AIIcon },
+    { tab: Tab.Shop, Icon: ShoppingCartIcon },
     { tab: Tab.Team, Icon: TeamIcon },
 ];
 

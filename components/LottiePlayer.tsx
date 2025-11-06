@@ -1,33 +1,34 @@
 // Fix: Use namespace import for React to ensure the JSX namespace is correctly resolved for module augmentation.
 import * as React from 'react';
 
-// Fix: Define LottiePlayerElement as a module-level interface. This resolves TypeScript errors
-// with JSX augmentation by ensuring the type is declared before it's referenced within `declare global`.
-interface LottiePlayerElement extends HTMLElement {
-  play: () => void;
-}
-
-// Fix: Extracted attributes into a dedicated interface for clarity and to resolve potential type augmentation issues.
-interface LottiePlayerAttributes extends React.HTMLAttributes<LottiePlayerElement> {
-  src: string;
-  background?: string;
-  speed?: string;
-  loop?: boolean;
-  autoplay?: boolean;
-}
-
-// Fix: Moved lottie-player type declarations into this file to resolve module augmentation issues.
-// By defining the custom element types here, we ensure they are available within this module's scope.
-// Fix: Replaced `React.DetailedHTMLProps` with its underlying types (`React.ClassAttributes` & `LottiePlayerAttributes`)
-// to resolve a potential type resolution issue with module augmentation for custom elements.
+// Fix: Add lottie-player type definitions locally to resolve JSX errors.
+// The global `types/lottie.d.ts` file was not being picked up by the build system.
 declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'lottie-player': React.ClassAttributes<LottiePlayerElement> & LottiePlayerAttributes;
+    // This interface is now globally available for use in component refs.
+    interface LottiePlayerElement extends HTMLElement {
+        play: () => void;
     }
-  }
+  
+    namespace JSX {
+        interface IntrinsicElements {
+            'lottie-player': React.DetailedHTMLProps<
+                React.HTMLAttributes<LottiePlayerElement> & {
+                    src: string;
+                    background?: string;
+                    speed?: string;
+                    loop?: boolean;
+                    autoplay?: boolean;
+                },
+                LottiePlayerElement
+            >;
+        }
+    }
 }
 
+
+// Fix: Removed duplicate lottie-player type definitions.
+// Global types are now consolidated in `types/lottie.d.ts`
+// to prevent conflicts and ensure reliable module augmentation.
 interface LottiePlayerProps {
     src: string;
     className?: string;
@@ -35,7 +36,7 @@ interface LottiePlayerProps {
 
 const LottiePlayer: React.FC<LottiePlayerProps> = ({ src, className }) => {
     // Use a ref to get direct access to the lottie-player DOM element
-    // The ref now correctly uses the LottiePlayerElement type.
+    // The ref correctly uses the LottiePlayerElement type, which is now globally available.
     const ref = React.useRef<LottiePlayerElement>(null);
 
     // This effect runs once on mount to set up the player

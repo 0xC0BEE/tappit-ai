@@ -5,7 +5,7 @@ export enum Tab {
     Home = 'Home',
     Cards = 'Cards',
     Network = 'Network',
-    AI = 'AI',
+    Shop = 'Shop',
     Team = 'Team',
 }
 
@@ -99,6 +99,7 @@ export interface TeamActivity {
 }
 
 export interface BrandKit {
+    id: string;
     logoUrl: string;
     primaryColor: string;
     font: string;
@@ -114,6 +115,11 @@ export interface AnalyticsData {
     performance: { name: string; taps: number }[];
 }
 
-// Fix: Removed the global type definitions for <lottie-player>.
-// The types have been moved into the LottiePlayer.tsx component file to resolve
-// module augmentation issues and make the component's types self-contained.
+// From ShopScreen.tsx
+export interface Product {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    imageUrl: string;
+}

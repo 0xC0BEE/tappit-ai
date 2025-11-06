@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
 import { CloseIcon, CardIcon, CertificateIcon } from '../icons.tsx';
 import { TeamMember, CardTemplate } from '../../types.ts';
-import { templates } from '../../data/templates.ts';
+import { supabase } from '../../services/supabase.ts';
 import TemplateCarousel from '../TemplateCarousel.tsx';
 import { useHaptics, HapticPattern } from '../../hooks/useHaptics.ts';
 
@@ -15,10 +15,29 @@ interface AssignCardModalProps {
 }
 
 const AssignCardModal: React.FC<AssignCardModalProps> = ({ isOpen, onClose, teamMembers }) => {
+    const [templates, setTemplates] = useState<CardTemplate[]>([]);
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-    const [selectedTemplate, setSelectedTemplate] = useState<CardTemplate>(templates[0]);
+    const [selectedTemplate, setSelectedTemplate] = useState<CardTemplate | null>(null);
     const [status, setStatus] = useState<'idle' | 'assigning' | 'success'>('idle');
     const { playHaptic } = useHaptics();
+
+    useEffect(() => {
+        if (isOpen) {
+            const fetchTemplates = async () => {
+                // Fix: Correctly await the mock Supabase query builder.
+                const { data, error } = await supabase.from('card_templates').select('*');
+                if (error) {
+                    console.error("Error fetching templates:", error);
+                } else if (data) {
+                    setTemplates(data as CardTemplate[]);
+                    if (data.length > 0) {
+                        setSelectedTemplate(data[0]);
+                    }
+                }
+            };
+            fetchTemplates();
+        }
+    }, [isOpen]);
 
     const handleToggleMember = (memberId: string) => {
         setSelectedMembers(prev => 
@@ -29,8 +48,8 @@ const AssignCardModal: React.FC<AssignCardModalProps> = ({ isOpen, onClose, team
     };
 
     const handleAssign = () => {
-        if (selectedMembers.length === 0) {
-            alert('Please select at least one team member.');
+        if (selectedMembers.length === 0 || !selectedTemplate) {
+            alert('Please select at least one team member and a template.');
             return;
         }
         setStatus('assigning');
@@ -103,11 +122,13 @@ const AssignCardModal: React.FC<AssignCardModalProps> = ({ isOpen, onClose, team
                         </div>
                     </div>
                     
-                    <TemplateCarousel 
-                        templates={templates}
-                        selectedTemplate={selectedTemplate}
-                        onSelectTemplate={setSelectedTemplate}
-                    />
+                    {selectedTemplate && (
+                        <TemplateCarousel 
+                            templates={templates}
+                            selectedTemplate={selectedTemplate}
+                            onSelectTemplate={setSelectedTemplate}
+                        />
+                    )}
                 </div>
 
                 <HapticButton 

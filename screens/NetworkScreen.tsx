@@ -1,39 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Contact, Interaction } from '../types.ts';
-import { contacts as initialContacts } from '../data/contacts.ts';
+import { supabase } from '../services/supabase.ts';
 import ContactCard from '../components/ContactCard.tsx';
 import GlassCard from '../components/GlassCard.tsx';
 import MemoryLaneTimeline from '../components/MemoryLaneTimeline.tsx';
 import HapticButton from '../components/HapticButton.tsx';
 import AddInteractionModal from '../components/modals/AddInteractionModal.tsx';
 import { PlusIcon } from '../components/icons.tsx';
+import LoadingSkeleton from '../components/LoadingSkeleton.tsx';
 
 interface NetworkScreenProps {
     onOpenFeedback: () => void;
 }
 
 const NetworkScreen: React.FC<NetworkScreenProps> = ({ onOpenFeedback }) => {
-    const [contacts, setContacts] = useState<Contact[]>(initialContacts);
+    const [contacts, setContacts] = useState<Contact[]>([]);
     const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
     const [isInteractionModalOpen, setInteractionModalOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchContacts = async () => {
+            setLoading(true);
+            // Fix: Correctly await the mock Supabase query builder.
+            const { data, error } = await supabase
+                .from('contacts')
+                .select('*, interactions(*)');
+            
+            if (error) {
+                console.error('Error fetching contacts:', error);
+            } else if (data) {
+                setContacts(data as Contact[]);
+            }
+            setLoading(false);
+        };
+
+        fetchContacts();
+    }, []);
 
     const handleSelectContact = (contact: Contact) => {
         setSelectedContact(contact);
     };
 
-    const handleAddInteraction = (interaction: Interaction) => {
+    const handleAddInteraction = async (interaction: Omit<Interaction, 'id' | 'date'>) => {
         if (!selectedContact) return;
 
-        const updatedContact: Contact = {
-            ...selectedContact,
-            interactions: [interaction, ...selectedContact.interactions],
-            lastInteraction: 'Just now',
+        const newInteraction = {
+            ...interaction,
+            contact_id: selectedContact.id,
         };
 
-        setContacts(prevContacts =>
-            prevContacts.map(c => c.id === updatedContact.id ? updatedContact : c)
-        );
-        setSelectedContact(updatedContact);
+        // Fix: Correctly await the mock Supabase query builder chain.
+        const { data, error } = await supabase
+            .from('interactions')
+            .insert(newInteraction)
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Error adding interaction:', error);
+            alert('Failed to add interaction.');
+        } else if (data) {
+            const updatedContact: Contact = {
+                ...selectedContact,
+                interactions: [data as Interaction, ...selectedContact.interactions],
+                lastInteraction: 'Just now',
+            };
+            setContacts(prevContacts =>
+                prevContacts.map(c => c.id === updatedContact.id ? updatedContact : c)
+            );
+            setSelectedContact(updatedContact);
+        }
     };
 
     if (selectedContact) {
@@ -85,13 +122,17 @@ const NetworkScreen: React.FC<NetworkScreenProps> = ({ onOpenFeedback }) => {
                 <p className="text-gray-300 text-lg mt-2">Your connections, supercharged.</p>
             </header>
             <div className="flex-grow overflow-y-auto pr-2 pb-24 space-y-4">
-                {contacts.map(contact => (
-                    <ContactCard 
-                        key={contact.id} 
-                        contact={contact} 
-                        onClick={() => handleSelectContact(contact)}
-                    />
-                ))}
+                {loading ? (
+                    Array.from({ length: 4 }).map((_, i) => <LoadingSkeleton key={i} />)
+                ) : (
+                    contacts.map(contact => (
+                        <ContactCard 
+                            key={contact.id} 
+                            contact={contact} 
+                            onClick={() => handleSelectContact(contact)}
+                        />
+                    ))
+                )}
             </div>
              <HapticButton onClick={onOpenFeedback} className="fixed bottom-24 right-8 bg-bamboo-8 text-white p-4 rounded-full shadow-lg shadow-bamboo-8/40 z-20">
                 <span role="img" aria-label="feedback">💡</span>

@@ -1,11 +1,26 @@
-import React from 'react';
-// Fix: Add file extension to satisfy bundler/type checker.
+import React, { useState, useEffect } from 'react';
 import { LeafIcon } from '../components/icons.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
-import { analyticsData } from '../data/analytics.ts';
+import { supabase } from '../services/supabase.ts';
 
 const CarbonSavedGem: React.FC = () => {
-    const carbonSaved = analyticsData.carbonSaved.current;
+    const [carbonSaved, setCarbonSaved] = useState(0);
+
+    useEffect(() => {
+        const fetchCarbonSaved = async () => {
+            // This is a simplified example. In a real app, you might fetch this
+            // from a user's profile or an analytics table.
+            // Fix: Correctly await the mock Supabase query builder chain.
+            const { data, error } = await supabase
+                .from('analytics')
+                .select('carbonSaved')
+                .single();
+
+            if (data) {
+                setCarbonSaved(data.carbonSaved.current);
+            }
+        };
+        fetchCarbonSaved();
+    }, []);
 
     return (
         <div className="text-center">
