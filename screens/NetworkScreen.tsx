@@ -59,10 +59,12 @@ const NetworkScreen: React.FC<NetworkScreenProps> = ({ onOpenFeedback }) => {
                             <span>Log</span>
                         </HapticButton>
                     </header>
-                    <GlassCard className="p-4 flex-grow overflow-y-auto pb-24">
-                        <h2 className="text-xl font-bold text-white mb-4 px-2">Memory Lane</h2>
-                        <MemoryLaneTimeline interactions={selectedContact.interactions} />
-                    </GlassCard>
+                    <div className="flex-grow overflow-y-auto pr-2 pb-24">
+                        <GlassCard className="p-4">
+                            <h2 className="text-xl font-bold text-white mb-4 px-2">Memory Lane</h2>
+                            <MemoryLaneTimeline interactions={selectedContact.interactions} />
+                        </GlassCard>
+                    </div>
                 </div>
                 <AddInteractionModal
                     isOpen={isInteractionModalOpen}

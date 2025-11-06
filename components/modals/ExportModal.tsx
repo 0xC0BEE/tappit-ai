@@ -3,6 +3,7 @@ import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
 import { CloseIcon, UploadIcon } from '../icons.tsx';
+import { useHaptics, HapticPattern } from '../../hooks/useHaptics.ts';
 
 interface ExportModalProps {
     isOpen: boolean;
@@ -12,17 +13,35 @@ interface ExportModalProps {
 const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
     const [format, setFormat] = useState('CSV');
     const [includeInteractions, setIncludeInteractions] = useState(true);
+    const [isExporting, setIsExporting] = useState(false);
+    const { playHaptic } = useHaptics();
 
     const handleExport = () => {
-        alert(`Exporting team data as ${format}... ${includeInteractions ? 'with interactions' : 'without interactions'}.`);
-        // In a real app, this would trigger a file download.
-        onClose();
+        setIsExporting(true);
+        playHaptic(HapticPattern.Click);
+        setTimeout(() => {
+            // Simulate file preparation and download
+            const content = "contact_name,email,taps\nJohn Doe,john@example.com,10";
+            const blob = new Blob([content], { type: `text/${format.toLowerCase()}` });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tappit-export.${format.toLowerCase()}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            playHaptic(HapticPattern.Success);
+            setIsExporting(false);
+            onClose();
+        }, 1500);
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={!isExporting ? onClose : () => {}}>
             <GlassCard className="w-[calc(100vw-2rem)] max-w-md mx-auto relative p-8 text-white space-y-4">
-                <HapticButton onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <HapticButton onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white" disabled={isExporting}>
                     <CloseIcon className="w-6 h-6" />
                 </HapticButton>
                 
@@ -61,10 +80,20 @@ const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
 
                 <HapticButton 
                     onClick={handleExport}
-                    className="w-full flex items-center justify-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors"
+                    disabled={isExporting}
+                    className="w-full flex items-center justify-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors disabled:opacity-50"
                 >
-                    <UploadIcon className="w-5 h-5 -rotate-90" />
-                    <span>Download Export</span>
+                    {isExporting ? (
+                        <>
+                            <div className="w-5 h-5 border-2 border-white/50 border-t-white rounded-full animate-spin"></div>
+                            <span>Preparing...</span>
+                        </>
+                    ) : (
+                        <>
+                            <UploadIcon className="w-5 h-5 -rotate-90" />
+                            <span>Download Export</span>
+                        </>
+                    )}
                 </HapticButton>
             </GlassCard>
         </Modal>

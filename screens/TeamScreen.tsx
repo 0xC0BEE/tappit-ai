@@ -4,11 +4,8 @@ import { TeamMember, BrandKit } from '../types.ts';
 import TeamMemberDetail from '../components/team/TeamMemberDetail.tsx';
 import AITeamInsights from '../components/team/AITeamInsights.tsx';
 import ActivityFeed from '../components/team/ActivityFeed.tsx';
-import BrandKitEditor from '../components/team/BrandKitEditor.tsx';
-import BulkActions from '../components/team/BulkActions.tsx';
-import AssignCardModal from '../components/modals/AssignCardModal.tsx';
-import ExportModal from '../components/modals/ExportModal.tsx';
 import InviteTeamModal from '../components/modals/InviteTeamModal.tsx';
+import CustomizeTeamModal from '../components/modals/CustomizeTeamModal.tsx';
 import HapticButton from '../components/HapticButton.tsx';
 import { PlusIcon, WandIcon } from '../components/icons.tsx';
 
@@ -16,10 +13,9 @@ const TeamScreen: React.FC = () => {
     const [members, setMembers] = useState<TeamMember[]>(initialMembers);
     const [brandKit, setBrandKit] = useState<BrandKit>(initialBrandKit);
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
-
-    const [isAssignModalOpen, setAssignModalOpen] = useState(false);
-    const [isExportModalOpen, setExportModalOpen] = useState(false);
+    
     const [isInviteModalOpen, setInviteModalOpen] = useState(false);
+    const [isCustomizeModalOpen, setCustomizeModalOpen] = useState(false);
 
     const handleSelectMember = (member: TeamMember) => {
         setSelectedMember(member);
@@ -31,7 +27,7 @@ const TeamScreen: React.FC = () => {
 
     return (
         <>
-            <div className="animate-scaleIn h-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="animate-scaleIn h-full grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Left column: Team Members & Actions */}
                 <div className="lg:col-span-1 h-full flex flex-col gap-6 overflow-y-auto pr-2 pb-24">
                      <header className="flex justify-between items-center">
@@ -43,7 +39,7 @@ const TeamScreen: React.FC = () => {
                         </div>
                         <div className="flex items-center space-x-2">
                              <HapticButton 
-                                onClick={() => alert('Customize action triggered!')}
+                                onClick={() => setCustomizeModalOpen(true)}
                                 className="flex items-center space-x-2 bg-white/10 text-white font-semibold py-2 px-4 rounded-full shadow-lg"
                             >
                                 <WandIcon className="w-5 h-5" />
@@ -79,25 +75,21 @@ const TeamScreen: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Center column: Insights & Feed */}
+                {/* Right column: Insights & Feed */}
                 <div className="lg:col-span-1 h-full flex flex-col gap-6 overflow-y-auto pr-2 pb-24">
                     <AITeamInsights />
                     <ActivityFeed activities={teamActivities} />
                 </div>
-
-                {/* Right column: Brand Kit & Bulk Actions */}
-                <div className="lg:col-span-1 h-full flex flex-col gap-6 overflow-y-auto pr-2 pb-24">
-                    <BrandKitEditor brandKit={brandKit} setBrandKit={setBrandKit} />
-                    <BulkActions 
-                        onAssignCard={() => setAssignModalOpen(true)}
-                        onExportData={() => setExportModalOpen(true)}
-                    />
-                </div>
             </div>
             
-            <AssignCardModal isOpen={isAssignModalOpen} onClose={() => setAssignModalOpen(false)} teamMembers={members} />
-            <ExportModal isOpen={isExportModalOpen} onClose={() => setExportModalOpen(false)} />
             <InviteTeamModal isOpen={isInviteModalOpen} onClose={() => setInviteModalOpen(false)} />
+            <CustomizeTeamModal 
+                isOpen={isCustomizeModalOpen} 
+                onClose={() => setCustomizeModalOpen(false)}
+                brandKit={brandKit}
+                setBrandKit={setBrandKit}
+                teamMembers={members}
+            />
         </>
     );
 };

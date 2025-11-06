@@ -18,5 +18,5 @@ export const teamActivities: TeamActivity[] = [
 export const brandKit: BrandKit = {
     logoUrl: '/logo-placeholder.svg',
     primaryColor: '#33a14d',
-    font: 'Inter',
+    font: 'Roboto',
 };

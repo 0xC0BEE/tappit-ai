@@ -21,10 +21,11 @@ const publicCardFields: CardField[] = [
     { id: 'f8', label: 'Intro Video', value: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', icon: PlayIcon, fieldType: FieldType.Video },
 ];
 
+// Use a glassmorphic style for the public card template
 const publicCardTemplate: CardTemplate = {
-    id: 't1', 
-    name: 'Emerald', 
-    className: 'bg-gradient-to-br from-bamboo-9 to-bamboo-11', 
+    id: 't-public', 
+    name: 'Public Glass', 
+    className: 'bg-black/20 backdrop-blur-2xl border border-white/10', 
     textColor: 'text-white' 
 };
 
@@ -41,7 +42,6 @@ const PublicCardScreen: React.FC<PublicCardScreenProps> = ({ onBack }) => {
         const phone = publicCardFields.find(f => f.label.toLowerCase() === 'phone')?.value || '';
         const website = publicCardFields.find(f => f.label.toLowerCase() === 'website')?.value || '';
 
-        // Create vCard string
         const vCardString = [
             'BEGIN:VCARD',
             'VERSION:3.0',
@@ -54,18 +54,15 @@ const PublicCardScreen: React.FC<PublicCardScreenProps> = ({ onBack }) => {
             'END:VCARD'
         ].join('\n');
 
-        // Create a blob from the vCard string
         const blob = new Blob([vCardString], { type: 'text/vcard;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         
-        // Create a temporary link to trigger the download
         const link = document.createElement('a');
         link.href = url;
         const fileName = `${name.replace(/\s+/g, '-').toLowerCase() || 'contact'}.vcf`;
         link.setAttribute('download', fileName);
         document.body.appendChild(link);
         
-        // Trigger the download and clean up
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
@@ -79,7 +76,7 @@ const PublicCardScreen: React.FC<PublicCardScreenProps> = ({ onBack }) => {
                     &larr; Back to App
                 </HapticButton>
             </header>
-            <main className="relative z-10 flex flex-col items-center justify-center space-y-8 w-full">
+            <main className="relative z-10 flex flex-col items-center justify-center space-y-6 w-full max-w-sm">
                 <TiltCardPreview 
                     template={publicCardTemplate}
                     fields={publicCardFields}
@@ -87,16 +84,18 @@ const PublicCardScreen: React.FC<PublicCardScreenProps> = ({ onBack }) => {
                     title={title}
                 />
                 
-                <HapticButton
-                    onClick={handleSaveContact}
-                    className="w-full max-w-sm bg-bamboo-8 text-white font-bold py-4 px-10 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors text-lg"
-                >
-                    Save to Contacts
-                </HapticButton>
+                <div className="w-full">
+                    <HapticButton
+                        onClick={handleSaveContact}
+                        className="w-full bg-bamboo-8 text-white font-bold py-4 px-10 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors text-lg"
+                    >
+                        Save to Contacts
+                    </HapticButton>
+                </div>
 
-                <footer className="text-center text-gray-400 text-sm">
+                <footer className="text-center text-gray-500 text-sm">
                     <p>Powered by Tappit AI</p>
-                    <a href="#" className="underline">Create your own free card</a>
+                    <a href="#" className="underline hover:text-bamboo-7">Create your own free card</a>
                 </footer>
             </main>
         </div>

@@ -2,16 +2,25 @@ import React from 'react';
 // Fix: Add file extension to satisfy bundler/type checker.
 import { CustomGemComponentProps } from '../types.ts';
 
-const CustomGemComponent: React.FC<CustomGemComponentProps> = ({ jsxString }) => {
-    // WARNING: This is a simplified implementation for demonstration.
-    // In a production app, rendering user-generated or AI-generated JSX/HTML
-    // requires a secure sandboxing approach to prevent XSS vulnerabilities
-    // and to properly handle React component rendering. A library like
-    // react-jsx-parser or a server-side rendering solution would be more appropriate.
+/**
+ * A simple HTML sanitizer to mitigate XSS risks from AI-generated content.
+ * This removes script tags and on* event handlers.
+ */
+const sanitizeHtml = (dirtyHtml: string | undefined): string => {
+    if (!dirtyHtml) return '';
+    let cleanHtml = dirtyHtml;
+    // Remove script tags and their content
+    cleanHtml = cleanHtml.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+    // Remove on* event handlers (e.g., onclick, onerror)
+    cleanHtml = cleanHtml.replace(/\s(on\w+)=("([^"]*)"|'([^']*)'|[^\s>]+)/gi, '');
+    return cleanHtml;
+};
 
-    // For this example, we'll use dangerouslySetInnerHTML to render the
-    // HTML structure and apply Tailwind classes. This will not execute
-    // any JavaScript or render nested React components within the string.
+const CustomGemComponent: React.FC<CustomGemComponentProps> = ({ jsxString }) => {
+    // WARNING: This component uses dangerouslySetInnerHTML. While the input is
+    // sanitized to remove common XSS vectors like <script> tags and on* handlers,
+    // a full sandboxing solution (like an iframe or a robust JSX parser) would be
+    // required for a production environment to be fully secure.
     
     // A simple function to strip the outer React component definition if the AI includes it.
     const extractJSX = (code: string | undefined): string => {
@@ -30,11 +39,11 @@ const CustomGemComponent: React.FC<CustomGemComponentProps> = ({ jsxString }) =>
         return code;
     };
     
-    const cleanHtmlString = extractJSX(jsxString);
+    const sanitizedHtmlString = sanitizeHtml(extractJSX(jsxString));
 
     return (
         <div className="p-2 bg-black/20 rounded-lg border border-white/10">
-            <div dangerouslySetInnerHTML={{ __html: cleanHtmlString }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizedHtmlString }} />
         </div>
     );
 };

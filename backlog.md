@@ -27,15 +27,8 @@ This document tracks all known bugs, incomplete features, and areas for improvem
 
 ### P2: Polish & Feature Completion
 
-*   **[FE-04] Expand Team Member Detail View:** The detail view for a team member shows basic stats but does not display their list of connections as intended.
-*   **[FE-05] Brand Kit Customization is Partially Implemented:** The font selection in the brand kit does not actually apply the selected font to the preview card.
-*   **[B-09] Bulk Action Modals are Not Fully Functional:** The "Assign Card" and "Export" modals open, but the final action buttons only trigger alerts. They need to simulate the bulk operation.
-*   **[UI-01] Text Overflows in Card Builder Editor:** Long text in the "Card Fields" input boxes can overflow and look unpolished.
-*   **[UI-03] Text Overflows on Public Card View:** The public-facing card does not handle long text fields well, causing text to spill out of the card's boundaries. The card size may need to be adjusted.
-*   **[UI-02] Improve Contrast in Card Builder:** The editor fields on the left panel have low contrast and can be hard to distinguish from the background.
+
 
 ### P3: Technical Debt & Future Enhancements
 
-*   **[TECH-01] Replace Mock Supabase Client:** The `useSupabase` hook uses a mock client to simulate real-time events. This needs to be replaced with a real Supabase JS client for production.
-*   **[TECH-03] Secure Custom Gem Rendering:** The `CustomGemComponent` uses `dangerouslySetInnerHTML`, which is a security risk. This needs to be replaced with a secure sandboxing solution (like a sandboxed iframe or a proper JSX parser).
 *   **[TECH-02] Optimize Color Extractor:** The `useColorExtractor` hook runs on the client and can be slow. This could be moved to a serverless function for better performance.

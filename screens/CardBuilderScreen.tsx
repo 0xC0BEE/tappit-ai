@@ -109,7 +109,7 @@ const CardBuilderScreen: React.FC = () => {
                     <div className="lg:col-span-1 h-full flex flex-col gap-6 overflow-y-auto pr-2 pb-24">
                         <EditorView />
                     </div>
-                    <div className="lg:col-span-1 h-full">
+                    <div className="lg:col-span-1 h-full flex items-center justify-center">
                         <TiltCardPreview template={template} fields={fields} name={name} title={title} />
                     </div>
                     <div className="lg:col-span-1 h-full">

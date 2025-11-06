@@ -54,7 +54,7 @@ const DraggableFieldList: React.FC<DraggableFieldListProps> = ({ fields, setFiel
                                 value={field.value}
                                 onChange={(e) => handleFieldChange(field.id, e.target.value)}
                                 placeholder={field.label}
-                                className="w-full bg-white/5 p-2 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-bamboo-8"
+                                className="w-full bg-white/10 p-2 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-bamboo-8 truncate"
                             />
                             <HapticButton onClick={() => handleRemoveField(field.id)} className="text-gray-500 hover:text-white p-1">
                                 <CloseIcon className="w-4 h-4" />

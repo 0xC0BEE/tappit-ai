@@ -113,3 +113,7 @@ export interface AnalyticsData {
     tapLocations: { lat: number; lng: number; count: number }[];
     performance: { name: string; taps: number }[];
 }
+
+// Fix: Removed the global type definitions for <lottie-player>.
+// The types have been moved into the LottiePlayer.tsx component file to resolve
+// module augmentation issues and make the component's types self-contained.

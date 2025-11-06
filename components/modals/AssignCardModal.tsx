@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
-import { CloseIcon, CardIcon } from '../icons.tsx';
+import { CloseIcon, CardIcon, CertificateIcon } from '../icons.tsx';
 import { TeamMember, CardTemplate } from '../../types.ts';
 import { templates } from '../../data/templates.ts';
 import TemplateCarousel from '../TemplateCarousel.tsx';
+import { useHaptics, HapticPattern } from '../../hooks/useHaptics.ts';
 
 interface AssignCardModalProps {
     isOpen: boolean;
@@ -16,6 +17,8 @@ interface AssignCardModalProps {
 const AssignCardModal: React.FC<AssignCardModalProps> = ({ isOpen, onClose, teamMembers }) => {
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
     const [selectedTemplate, setSelectedTemplate] = useState<CardTemplate>(templates[0]);
+    const [status, setStatus] = useState<'idle' | 'assigning' | 'success'>('idle');
+    const { playHaptic } = useHaptics();
 
     const handleToggleMember = (memberId: string) => {
         setSelectedMembers(prev => 
@@ -30,14 +33,49 @@ const AssignCardModal: React.FC<AssignCardModalProps> = ({ isOpen, onClose, team
             alert('Please select at least one team member.');
             return;
         }
-        alert(`Assigned template "${selectedTemplate.name}" to ${selectedMembers.length} member(s).`);
-        onClose();
+        setStatus('assigning');
+        playHaptic(HapticPattern.Click);
+        setTimeout(() => {
+            setStatus('success');
+            playHaptic(HapticPattern.Success);
+            setTimeout(() => {
+                onClose();
+                setStatus('idle');
+                setSelectedMembers([]);
+            }, 1500);
+        }, 1000);
     };
 
+    const getButtonContent = () => {
+        switch (status) {
+            case 'assigning':
+                return (
+                    <>
+                        <div className="w-5 h-5 border-2 border-white/50 border-t-white rounded-full animate-spin"></div>
+                        <span>Assigning...</span>
+                    </>
+                );
+            case 'success':
+                return (
+                    <>
+                        <CertificateIcon className="w-5 h-5" />
+                        <span>Success!</span>
+                    </>
+                );
+            default:
+                return (
+                     <>
+                        <CardIcon className="w-5 h-5" />
+                        <span>Assign Template</span>
+                    </>
+                );
+        }
+    };
+    
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={status === 'idle' ? onClose : () => {}}>
             <GlassCard className="w-[calc(100vw-2rem)] max-w-lg mx-auto relative p-8 text-white space-y-4">
-                <HapticButton onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <HapticButton onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white" disabled={status !== 'idle'}>
                     <CloseIcon className="w-6 h-6" />
                 </HapticButton>
                 
@@ -48,7 +86,7 @@ const AssignCardModal: React.FC<AssignCardModalProps> = ({ isOpen, onClose, team
 
                 <div className="space-y-4">
                     <div>
-                        <h3 className="text-lg font-semibold mb-2">Select Members</h3>
+                        <h3 className="text-lg font-semibold mb-2">Select Members ({selectedMembers.length})</h3>
                         <div className="max-h-40 overflow-y-auto space-y-2 p-2 bg-black/20 rounded-lg">
                             {teamMembers.map(member => (
                                 <label key={member.id} className="flex items-center space-x-3 p-2 rounded-md hover:bg-white/10 cursor-pointer">
@@ -74,11 +112,12 @@ const AssignCardModal: React.FC<AssignCardModalProps> = ({ isOpen, onClose, team
 
                 <HapticButton 
                     onClick={handleAssign}
-                    disabled={selectedMembers.length === 0}
-                    className="w-full flex items-center justify-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors disabled:opacity-50"
+                    disabled={selectedMembers.length === 0 || status !== 'idle'}
+                    className={`w-full flex items-center justify-center space-x-2 font-bold py-3 px-6 rounded-full shadow-lg transition-colors
+                        ${status === 'success' ? 'bg-green-500 text-white shadow-green-500/30' : 'bg-bamboo-8 text-white shadow-bamboo-8/30 hover:bg-bamboo-9'} 
+                        disabled:opacity-70 disabled:hover:bg-bamboo-8`}
                 >
-                    <CardIcon className="w-5 h-5" />
-                    <span>Assign Template</span>
+                    {getButtonContent()}
                 </HapticButton>
             </GlassCard>
         </Modal>
