@@ -1,6 +1,7 @@
 // Fix: Changed React import from default to namespace to align with project convention and help resolve JSX type errors.
 import * as React from 'react';
-import { motion } from 'framer-motion';
+// FIX: Use the full CDN URL to resolve the Vite build error.
+import { motion } from 'https://aistudiocdn.com/framer-motion@^11.3.19';
 import { TreeIcon } from './icons.tsx';
 
 // Lottie is banned. This component is now a placeholder that uses Framer Motion and SVG.
