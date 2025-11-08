@@ -56,6 +56,10 @@ const TheTapSection: React.FC = () => {
                             <p className="text-xs text-gray-400">Innovate Inc.</p>
                             <div className="mt-2 w-full h-1.5 bg-green-500 rounded-full"></div>
                         </GlassCard>
+                         <GlassCard className="absolute top-1/2 left-1/4 w-56 p-3 animate-float animation-delay-500 z-0">
+                            <p className="text-xs font-semibold text-white">Relationship Health</p>
+                            <p className="text-xs text-gray-400">Jane Doe: <span className="text-yellow-400">Needs Nurturing</span></p>
+                        </GlassCard>
                          <GlassCard className="absolute bottom-0 right-0 w-72 p-4 animate-float animation-delay-300">
                              <p className="text-sm font-semibold text-white">AI Suggestion</p>
                             <p className="text-xs text-gray-300">"Follow up with Jane about the Q3 funding. Her company was just in the news."</p>

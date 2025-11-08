@@ -24,16 +24,23 @@ const TeamOSSection: React.FC = () => {
                              <p className="text-xs text-gray-300">Michael Scott</p>
                              <p className="text-xs text-gray-400">45 new connections</p>
                         </GlassCard>
+                         <GlassCard className="absolute bottom-10 left-10 w-60 p-3 animate-float animation-delay-500">
+                             <h3 className="text-sm font-semibold text-white">Collective Impact</h3>
+                             <div className="flex items-center space-x-2 mt-1">
+                                <LeafIcon className="w-5 h-5 text-bamboo-7"/>
+                                <p className="text-xs text-gray-300">10.8g of CO₂ saved</p>
+                             </div>
+                        </GlassCard>
                         <div className="absolute inset-8 bg-gradient-to-br from-bamboo-8 to-bamboo-10 rounded-full blur-3xl opacity-50"></div>
                     </div>
 
                     {/* Right Column: Features */}
                     <div className="space-y-8">
                         <div className={getAnimationClass('')}>
-                             <h2 className="text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7 leading-tight lg:text-right">
+                             <h2 className="text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7 leading-tight">
                                 An OS for Your Entire Team.
                             </h2>
-                            <p className="text-gray-300 text-lg mt-4 lg:text-right">
+                            <p className="text-gray-300 text-lg mt-4">
                                 Unify your team's networking efforts with a single platform. Manage branding, track performance, and close deals as one cohesive unit.
                             </p>
                         </div>
@@ -44,7 +51,6 @@ const TeamOSSection: React.FC = () => {
                                 text="Ensure brand consistency across all team members' cards with a central logo, color, and font manager."
                                 isVisible={isVisible}
                                 delay="delay-200"
-                                align="right"
                             />
                             <FeatureItem
                                 icon={UsersIcon}
@@ -52,7 +58,6 @@ const TeamOSSection: React.FC = () => {
                                 text="Get a bird's-eye view of your team's networking performance and identify your top connectors."
                                 isVisible={isVisible}
                                 delay="delay-300"
-                                align="right"
                             />
                             <FeatureItem
                                 icon={LeafIcon}
@@ -60,7 +65,6 @@ const TeamOSSection: React.FC = () => {
                                 text="Track your team's combined environmental impact and celebrate your sustainability milestones together."
                                 isVisible={isVisible}
                                 delay="delay-400"
-                                align="right"
                             />
                         </div>
                     </div>
