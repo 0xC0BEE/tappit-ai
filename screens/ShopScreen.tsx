@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import ProductCard from '../components/shop/ProductCard.tsx';
 import CheckoutModal from '../components/modals/CheckoutModal.tsx';
 import { Product } from '../types.ts';
@@ -21,8 +22,9 @@ const products: Product[] = [
 ];
 
 const ShopScreen: React.FC = () => {
-    const [isCheckoutModalOpen, setCheckoutModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    // Fix: Use React.useState
+    const [isCheckoutModalOpen, setCheckoutModalOpen] = React.useState(false);
+    const [selectedProduct, setSelectedProduct] = React.useState<Product | null>(null);
 
     const handleOrderNow = (product: Product) => {
         setSelectedProduct(product);

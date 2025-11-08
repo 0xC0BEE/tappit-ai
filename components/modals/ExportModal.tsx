@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
@@ -11,9 +13,10 @@ interface ExportModalProps {
 }
 
 const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
-    const [format, setFormat] = useState('CSV');
-    const [includeInteractions, setIncludeInteractions] = useState(true);
-    const [isExporting, setIsExporting] = useState(false);
+    // Fix: Use React.useState
+    const [format, setFormat] = React.useState('CSV');
+    const [includeInteractions, setIncludeInteractions] = React.useState(true);
+    const [isExporting, setIsExporting] = React.useState(false);
     const { playHaptic } = useHaptics();
 
     const handleExport = () => {

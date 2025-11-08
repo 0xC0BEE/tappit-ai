@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 import HapticButton from './HapticButton.tsx';
 import { ChevronDownIcon } from './icons.tsx';
@@ -17,14 +18,15 @@ interface CustomSelectProps {
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, placeholder }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const wrapperRef = useRef<HTMLDivElement>(null);
-    const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+    // Fix: Use React.useState, React.useRef, React.useEffect
+    const [isOpen, setIsOpen] = React.useState(false);
+    const wrapperRef = React.useRef<HTMLDivElement>(null);
+    const [position, setPosition] = React.useState({ top: 0, left: 0, width: 0 });
     
     const selectedOption = options.find(opt => opt.value === value);
     const displayLabel = selectedOption?.label || placeholder;
 
-    useEffect(() => {
+    React.useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
@@ -40,7 +42,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
         };
     }, [isOpen]);
     
-    useEffect(() => {
+    React.useEffect(() => {
         if (isOpen && wrapperRef.current) {
             const rect = wrapperRef.current.getBoundingClientRect();
             setPosition({
@@ -58,7 +60,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, p
 
     const DropdownPortal = () => ReactDOM.createPortal(
         <div 
-            className="fixed z-[99] animate-fadeIn"
+            className="fixed z-[9999] animate-fadeIn"
             style={{ top: position.top + 8, left: position.left, width: position.width }}
         >
             <div className="w-full bg-bamboo-12 border border-white/10 rounded-lg shadow-lg overflow-hidden">

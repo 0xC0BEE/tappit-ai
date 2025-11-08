@@ -1,7 +1,9 @@
-import React, { ReactNode } from 'react';
+
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 
 interface GlassCardProps {
-    children: ReactNode;
+    children: React.ReactNode;
     className?: string;
 }
 

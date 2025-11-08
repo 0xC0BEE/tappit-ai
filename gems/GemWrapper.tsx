@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import { ChevronDownIcon } from '../components/icons.tsx';
 import { springTransition } from '../utils/spring.ts';
 import HapticButton from '../components/HapticButton.tsx';
@@ -10,7 +12,8 @@ interface GemWrapperProps {
 }
 
 const GemWrapper: React.FC<GemWrapperProps> = ({ title, description, children }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
+    // Fix: Use React.useState
+    const [isExpanded, setIsExpanded] = React.useState(false);
 
     return (
         <div className="bg-black/20 border border-white/10 rounded-xl p-3">

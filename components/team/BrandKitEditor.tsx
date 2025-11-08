@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
 import { BrandKit } from '../../types.ts';
@@ -21,18 +22,19 @@ const fontOptions = [
 ];
 
 const BrandKitEditor: React.FC<BrandKitEditorProps> = ({ brandKit, setBrandKit }) => {
-    const [localColor, setLocalColor] = useState(brandKit.primaryColor);
+    // Fix: Use React.useState, React.useRef, React.useEffect
+    const [localColor, setLocalColor] = React.useState(brandKit.primaryColor);
     const debouncedColor = useDebounce(localColor, 300);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [isPreviewModalOpen, setIsPreviewModalOpen] = React.useState(false);
 
     React.useEffect(() => {
         setBrandKit(prev => ({ ...prev, primaryColor: debouncedColor }));
     }, [debouncedColor, setBrandKit]);
 
-    const handleFontChange = (font: string) => {
+    const handleFontChange = React.useCallback((font: string) => {
         setBrandKit(prev => ({...prev, font}));
-    };
+    }, [setBrandKit]);
 
     const handleLogoUploadClick = () => {
         fileInputRef.current?.click();

@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import { GoogleGenAI } from "@google/genai";
 import HapticButton from '../components/HapticButton.tsx';
 
 const SmartTagGem: React.FC = () => {
-    const [tags, setTags] = useState<string[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    // Fix: Use React.useState
+    const [tags, setTags] = React.useState<string[]>([]);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     const handleGenerate = async () => {
         setIsLoading(true);
@@ -18,6 +21,7 @@ const SmartTagGem: React.FC = () => {
                     systemInstruction: "You suggest professional tags for business cards. Return a comma-separated list of tags.",
                 }
             });
+            // Fix: Use response.text to get the generated content as per coding guidelines.
             const tagString = response.text.trim();
             setTags(tagString.split(',').map(tag => tag.trim()));
         } catch (error) {

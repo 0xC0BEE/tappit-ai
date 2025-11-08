@@ -1,4 +1,5 @@
-import React from 'react';
+// Fix: Change to namespace import to ensure React types are correctly resolved.
+import * as React from 'react';
 
 /**
  * A CSS-in-JS object for a spring-like transition on the `transform` property.

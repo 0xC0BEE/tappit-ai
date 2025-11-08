@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 // Fix: Add file extension to satisfy bundler/type checker.
 import LottiePlayer from '../components/LottiePlayer.tsx';
 // Fix: Add file extension to satisfy bundler/type checker.
@@ -12,7 +14,7 @@ interface OnboardingScreenProps {
 }
 
 const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = React.useState(1);
 
     const handleNext = () => setStep(prev => Math.min(prev + 1, 3));
     const handleBack = () => setStep(prev => Math.max(prev - 1, 1));

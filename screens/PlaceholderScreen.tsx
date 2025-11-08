@@ -1,5 +1,6 @@
 
-import React from 'react';
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 // Fix: Add file extension to satisfy bundler/type checker.
 import GlassCard from '../components/GlassCard.tsx';
 

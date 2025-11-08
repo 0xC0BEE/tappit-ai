@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import { supabase } from '../../services/supabase.ts';
 import { TeamMember, Contact } from '../../types.ts';
 import GlassCard from '../GlassCard.tsx';
@@ -12,10 +13,11 @@ interface TeamMemberDetailProps {
 }
 
 const TeamMemberDetail: React.FC<TeamMemberDetailProps> = ({ member, onBack }) => {
-    const [connections, setConnections] = useState<Contact[]>([]);
-    const [loading, setLoading] = useState(true);
+    // Fix: Use React.useState and React.useEffect
+    const [connections, setConnections] = React.useState<Contact[]>([]);
+    const [loading, setLoading] = React.useState(true);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const fetchConnections = async () => {
             setLoading(true);
             // In a real schema, you'd likely filter contacts by team_member_id

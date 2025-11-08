@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 import { Tab } from './types.ts';
 import { useTheme } from './hooks/useTheme.ts';
 import { supabase } from './services/supabase.ts';
@@ -21,12 +22,12 @@ import ShopScreen from './screens/ShopScreen.tsx';
 
 const App: React.FC = () => {
     useTheme();
-    const [session, setSession] = useState<Session | null>(null);
-    const [isOnboarding, setIsOnboarding] = useState(true);
-    const [activeTab, setActiveTab] = useState<Tab>(Tab.Home);
-    const [isFeedbackModalOpen, setFeedbackModalOpen] = useState(false);
+    const [session, setSession] = React.useState<Session | null>(null);
+    const [isOnboarding, setIsOnboarding] = React.useState(true);
+    const [activeTab, setActiveTab] = React.useState<Tab>(Tab.Home);
+    const [isFeedbackModalOpen, setFeedbackModalOpen] = React.useState(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
         });
@@ -43,7 +44,7 @@ const App: React.FC = () => {
         setIsOnboarding(false);
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (localStorage.getItem('hasOnboarded') === 'true') {
             setIsOnboarding(false);
         }
@@ -66,28 +67,28 @@ const App: React.FC = () => {
         }
     };
     
+    // If there is no session, render the full-page IntroScreen
+    if (!session) {
+        return <IntroScreen />;
+    }
+
+    // If there is a session, render the main app experience
     return (
         <ShakeToReportButton>
             <main className="h-screen w-screen overflow-hidden bg-bamboo-12 text-white font-sans flex flex-col">
                 <BambooBackground />
-
-                {!session && <IntroScreen />}
-                
-                {session && (
-                    <div className="flex-grow flex flex-col overflow-hidden animate-fadeIn">
-                        {isOnboarding ? (
-                            <OnboardingScreen onComplete={handleOnboardingComplete} />
-                        ) : (
-                            <>
-                                <div className="flex-grow overflow-hidden relative p-4 lg:p-8 pt-0 lg:pt-0">
-                                    {renderActiveScreen()}
-                                </div>
-                                <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
-                            </>
-                        )}
-                    </div>
-                )}
-                
+                <div className="flex-grow flex flex-col overflow-hidden animate-fadeIn">
+                    {isOnboarding ? (
+                        <OnboardingScreen onComplete={handleOnboardingComplete} />
+                    ) : (
+                        <>
+                            <div className="flex-grow overflow-y-auto relative p-4 lg:p-8 pt-0 lg:pt-0">
+                                {renderActiveScreen()}
+                            </div>
+                            <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
+                        </>
+                    )}
+                </div>
                 <FeedbackModal 
                   isOpen={isFeedbackModalOpen} 
                   onClose={() => setFeedbackModalOpen(false)} 

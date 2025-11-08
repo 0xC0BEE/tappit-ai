@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
@@ -21,10 +22,11 @@ interface CheckoutModalProps {
 type CheckoutStep = 'shipping' | 'payment' | 'confirmation';
 
 const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, product }) => {
-    const [step, setStep] = useState<CheckoutStep>('shipping');
+    // Fix: Use React.useState and React.useEffect
+    const [step, setStep] = React.useState<CheckoutStep>('shipping');
     const { playHaptic } = useHaptics();
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (isOpen) {
             setStep('shipping'); // Reset to first step when opened
         }

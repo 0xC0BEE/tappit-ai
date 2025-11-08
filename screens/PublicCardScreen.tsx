@@ -1,4 +1,5 @@
-import React from 'react';
+// Fix: Change to namespace import to ensure JSX types are available globally.
+import * as React from 'react';
 import BambooBackground from '../components/BambooBackground.tsx';
 import TiltCardPreview from '../components/TiltCardPreview.tsx';
 import HapticButton from '../components/HapticButton.tsx';

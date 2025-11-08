@@ -14,7 +14,12 @@
     "@google/genai": "^1.28.0",
     "@jest/globals": "^30.2.0",
     "@testing-library/react": "^16.3.0",
-    "@supabase/supabase-js": "^2.79.0"
+    "@supabase/supabase-js": "^2.79.0",
+    "framer-motion": "^11.3.19",
+    "react-intersection-observer": "^9.13.0",
+    "isomorphic-fetch": "^3.0.0",
+    "tamagui": "^1.136.1",
+    "@tamagui/config": "^1.136.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

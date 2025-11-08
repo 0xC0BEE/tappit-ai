@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import { LeafIcon } from '../components/icons.tsx';
 import { supabase } from '../services/supabase.ts';
 
 const CarbonSavedGem: React.FC = () => {
-    const [carbonSaved, setCarbonSaved] = useState(0);
+    // Fix: Use React.useState and React.useEffect
+    const [carbonSaved, setCarbonSaved] = React.useState(0);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const fetchCarbonSaved = async () => {
             // This is a simplified example. In a real app, you might fetch this
             // from a user's profile or an analytics table.

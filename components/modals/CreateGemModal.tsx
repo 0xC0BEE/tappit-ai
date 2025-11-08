@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { GoogleGenAI } from "@google/genai";
+
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
+import { GoogleGenAI, Type } from "@google/genai";
 // Fix: Add file extension to satisfy bundler/type checker.
 import Modal from '../Modal.tsx';
 // Fix: Add file extension to satisfy bundler/type checker.
@@ -18,9 +20,10 @@ interface CreateGemModalProps {
 }
 
 const CreateGemModal: React.FC<CreateGemModalProps> = ({ isOpen, onClose, onGemCreated }) => {
-    const [prompt, setPrompt] = useState('');
-    const [name, setName] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    // Fix: Use React.useState
+    const [prompt, setPrompt] = React.useState('');
+    const [name, setName] = React.useState('');
+    const [isLoading, setIsLoading] = React.useState(false);
 
     const handleCreateGem = async () => {
         if (!prompt || !name) {

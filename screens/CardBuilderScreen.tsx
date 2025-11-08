@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from 'react';
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 import { GoogleGenAI } from '@google/genai';
 import { supabase } from '../services/supabase.ts';
 import TiltCardPreview from '../components/TiltCardPreview.tsx';
 import GemSidebar from '../components/GemSidebar.tsx';
 import DraggableFieldList from '../components/DraggableFieldList.tsx';
-import TemplateCarousel from '../components/TemplateCarousel.tsx';
-import { CardField, CardTemplate } from '../types.ts';
+import { CardField, CardTemplate, FieldType } from '../types.ts';
 import ShareModal from '../components/ShareModal.tsx';
 import HapticButton from '../components/HapticButton.tsx';
 import PublicCardScreen from './PublicCardScreen.tsx';
-// Fix: Add missing import for ShareIcon.
-import { ShareIcon } from '../components/icons.tsx';
+import { LinkIcon, PlusIcon, ShareIcon, WandIcon } from '../components/icons.tsx';
+import AIStudioSheet from '../components/AIStudioSheet.tsx';
+import TemplateBar from '../components/TemplateBar.tsx';
+import LoadingSkeleton from '../components/LoadingSkeleton.tsx';
 
 const CardBuilderScreen: React.FC = () => {
-    const [fields, setFields] = useState<CardField[]>([]);
-    const [templates, setTemplates] = useState<CardTemplate[]>([]);
-    const [template, setTemplate] = useState<CardTemplate | null>(null);
-    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-    const [isPreviewing, setIsPreviewing] = useState(false);
-    const [mobileTab, setMobileTab] = useState<'editor' | 'preview'>('editor');
-    const [loading, setLoading] = useState(true);
+    const [fields, setFields] = React.useState<CardField[]>([]);
+    const [templates, setTemplates] = React.useState<CardTemplate[]>([]);
+    const [template, setTemplate] = React.useState<CardTemplate | null>(null);
+    const [isShareModalOpen, setIsShareModalOpen] = React.useState(false);
+    const [isPreviewing, setIsPreviewing] = React.useState(false);
+    const [isAiSheetOpen, setIsAiSheetOpen] = React.useState(false);
+    const [loading, setLoading] = React.useState(true);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            // Fetch card fields and templates for the current user
-            // Fix: Correctly await the mock Supabase query builder.
             const { data: fieldsData, error: fieldsError } = await supabase.from('card_fields').select('*');
             const { data: templatesData, error: templatesError } = await supabase.from('card_templates').select('*');
             
@@ -34,8 +34,7 @@ const CardBuilderScreen: React.FC = () => {
             } else {
                 setFields(fieldsData as CardField[]);
                 setTemplates(templatesData as CardTemplate[]);
-                // Set default template
-                if (templatesData.length > 0) {
+                if (templatesData && templatesData.length > 0) {
                     setTemplate(templatesData[0]);
                 }
             }
@@ -43,22 +42,34 @@ const CardBuilderScreen: React.FC = () => {
         };
         fetchData();
     }, []);
-
-    const handleUpdateFields = async (newFields: CardField[]) => {
-        setFields(newFields);
-        // Here you would debounce and update Supabase
-        // e.g., await supabase.from('card_fields').upsert(newFields);
-    };
-
-    const handleUpdateTemplate = async (newTemplate: CardTemplate) => {
-        setTemplate(newTemplate);
-        // Here you would update the user's selected template
-        // e.g., await supabase.from('profiles').update({ selected_template_id: newTemplate.id });
-    };
-
-    const name = fields.find(f => f.label.toLowerCase().includes('name'))?.value || 'Your Name';
-    const title = fields.find(f => f.label.toLowerCase().includes('title'))?.value || 'Your Title';
     
+    // Fix: Wrap all state handlers in useCallback to prevent unnecessary re-renders in child components,
+    // which was the root cause of the input focus and dropdown selection bugs.
+    const handleUpdateField = React.useCallback((id: string, value: string) => {
+        setFields(prevFields => 
+            prevFields.map(field => field.id === id ? { ...field, value } : field)
+        );
+    }, []);
+
+    const handleAddField = React.useCallback(() => {
+        const newField: CardField = {
+            id: `field-${Date.now()}`,
+            label: 'New Field',
+            value: '',
+            icon: LinkIcon,
+            fieldType: FieldType.Text,
+        };
+        setFields(prevFields => [...prevFields, newField]);
+    }, []);
+
+    const handleRemoveField = React.useCallback((id: string) => {
+        setFields(prevFields => prevFields.filter(field => field.id !== id));
+    }, []);
+
+    const handleUpdateTemplate = (newTemplate: CardTemplate) => {
+        setTemplate(newTemplate);
+    };
+
     const handleAIPolish = async () => {
         const titleField = fields.find(f => f.label.toLowerCase().includes('title'));
         if (!titleField) return;
@@ -70,8 +81,7 @@ const CardBuilderScreen: React.FC = () => {
                 config: { systemInstruction: "You are a professional title enhancer. You only return the enhanced title, with no extra text or quotes." }
             });
             const newTitle = response.text.trim();
-            const newFields = fields.map(field => field.id === titleField.id ? { ...field, value: newTitle } : field);
-            handleUpdateFields(newFields);
+            handleUpdateField(titleField.id, newTitle);
         } catch (error) {
             console.error("AI Polish failed:", error);
             throw error;
@@ -81,57 +91,84 @@ const CardBuilderScreen: React.FC = () => {
     if (isPreviewing) {
         return <PublicCardScreen onBack={() => setIsPreviewing(false)} />;
     }
-    
-    const EditorView = () => (
-         <div className="flex flex-col gap-6">
-            <DraggableFieldList fields={fields} setFields={handleUpdateFields} />
-            <TemplateCarousel templates={templates} selectedTemplate={template!} onSelectTemplate={handleUpdateTemplate} />
-             <HapticButton 
-                onClick={() => setIsShareModalOpen(true)}
-                className="w-full flex items-center justify-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors">
-                <ShareIcon className="w-5 h-5" />
-                <span>Share</span>
-            </HapticButton>
-        </div>
-    );
+
+    const name = fields.find(f => f.label.toLowerCase().includes('name'))?.value || 'Your Name';
+    const title = fields.find(f => f.label.toLowerCase().includes('title'))?.value || 'Your Title';
 
     if (loading || !template) {
-        return <div className="text-center p-8">Loading Card Builder...</div>;
+        return (
+            <div className="p-4 space-y-4">
+                <LoadingSkeleton />
+                <LoadingSkeleton />
+                <LoadingSkeleton />
+            </div>
+        );
     }
-
+    
     return (
         <>
-            <div className="animate-scaleIn h-full flex flex-col">
-                <header>
-                    <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7">
-                        Card Builder
-                    </h1>
-                    <p className="text-gray-300 text-lg mt-2">Design your digital identity.</p>
-                </header>
-
-                <div className="lg:hidden flex border-b border-white/10 my-4">
-                    <HapticButton onClick={() => setMobileTab('editor')} className={`flex-1 py-2 text-center font-semibold transition-colors relative ${mobileTab === 'editor' ? 'text-bamboo-7' : 'text-gray-400'}`}>
-                        Editor
-                        {mobileTab === 'editor' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-bamboo-7"></div>}
-                    </HapticButton>
-                    <HapticButton onClick={() => setMobileTab('preview')} className={`flex-1 py-2 text-center font-semibold transition-colors relative ${mobileTab === 'preview' ? 'text-bamboo-7' : 'text-gray-400'}`}>
-                        Preview
-                         {mobileTab === 'preview' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-bamboo-7"></div>}
-                    </HapticButton>
-                </div>
-                
-                <div className="hidden lg:grid lg:grid-cols-3 gap-8 flex-grow">
-                    <div className="lg:col-span-1 h-full flex flex-col gap-6 overflow-y-auto pr-2 pb-24"><EditorView /></div>
-                    <div className="lg:col-span-1 h-full flex items-center justify-center"><TiltCardPreview template={template} fields={fields} name={name} title={title} /></div>
-                    <div className="lg:col-span-1 h-full"><GemSidebar onAIPolish={handleAIPolish} /></div>
-                </div>
-
-                <div className="lg:hidden flex-grow overflow-y-auto pb-24">
-                    <div className={`${mobileTab === 'editor' ? 'space-y-8' : 'hidden'}`}>
-                        <EditorView />
+            <div className="animate-scaleIn h-full w-full flex flex-col">
+                {/* --- DESKTOP 3-COLUMN LAYOUT --- */}
+                <div className="hidden lg:grid lg:grid-cols-3 gap-8 h-full">
+                    {/* Left Column: Editor */}
+                    <div className="lg:col-span-1 h-full flex flex-col gap-6 pr-2 overflow-y-auto">
+                        <header>
+                            <h1 className="text-4xl">Card Builder</h1>
+                            <p className="text-gray-300 text-lg mt-2">Design your digital identity.</p>
+                        </header>
+                        <DraggableFieldList 
+                            fields={fields} 
+                            onAddField={handleAddField}
+                            onRemoveField={handleRemoveField}
+                            onFieldChange={handleUpdateField}
+                        />
+                    </div>
+                    {/* Center Column: Preview */}
+                    <div className="lg:col-span-1 h-full flex flex-col items-center justify-center gap-6">
+                        <TiltCardPreview template={template} fields={fields} name={name} title={title} />
+                        <TemplateBar templates={templates} selectedTemplate={template} onSelectTemplate={handleUpdateTemplate} />
+                         <HapticButton 
+                            onClick={() => setIsShareModalOpen(true)}
+                            className="w-full max-w-sm flex items-center justify-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-6 rounded-full shadow-lg shadow-bamboo-8/30 hover:bg-bamboo-9 transition-colors">
+                            <ShareIcon className="w-5 h-5" />
+                            <span>Share</span>
+                        </HapticButton>
+                    </div>
+                    {/* Right Column: AI Studio */}
+                    <div className="lg:col-span-1 h-full overflow-y-auto">
                         <GemSidebar onAIPolish={handleAIPolish} />
                     </div>
-                    <div className={`${mobileTab === 'preview' ? 'h-full' : 'hidden'}`}><TiltCardPreview template={template} fields={fields} name={name} title={title} /></div>
+                </div>
+
+                {/* --- MOBILE LAYOUT --- */}
+                <div className="lg:hidden h-full flex flex-col">
+                    <div className="p-4 sticky top-0 bg-bamboo-12/80 backdrop-blur-md z-10">
+                         <TiltCardPreview template={template} fields={fields} name={name} title={title} />
+                    </div>
+                    <div className="flex-grow overflow-y-auto p-4 space-y-6">
+                        <DraggableFieldList 
+                            fields={fields} 
+                            onAddField={() => {}} // FAB handles this on mobile
+                            onRemoveField={handleRemoveField}
+                            onFieldChange={handleUpdateField}
+                            isMobile
+                        />
+                         <TemplateBar templates={templates} selectedTemplate={template} onSelectTemplate={handleUpdateTemplate} />
+                    </div>
+                    {/* Mobile Floating Buttons & Sticky Bar */}
+                    <HapticButton onClick={handleAddField} className="absolute bottom-24 right-6 bg-bamboo-8 rounded-full p-4 shadow-lg z-20">
+                        <PlusIcon className="w-6 h-6 text-white" />
+                    </HapticButton>
+                    <div className="sticky bottom-0 bg-bamboo-12/80 backdrop-blur-md p-4 border-t border-white/10 z-10 grid grid-cols-2 gap-4">
+                        <HapticButton onClick={() => setIsAiSheetOpen(true)} className="w-full flex items-center justify-center space-x-2 bg-white/10 text-white font-bold py-3 px-6 rounded-full">
+                            <WandIcon className="w-5 h-5" />
+                            <span>AI Studio</span>
+                        </HapticButton>
+                         <HapticButton onClick={() => setIsShareModalOpen(true)} className="w-full flex items-center justify-center space-x-2 bg-bamboo-8 text-white font-bold py-3 px-6 rounded-full">
+                            <ShareIcon className="w-5 h-5" />
+                            <span>Share</span>
+                        </HapticButton>
+                    </div>
                 </div>
             </div>
 
@@ -142,6 +179,9 @@ const CardBuilderScreen: React.FC = () => {
                 template={template}
                 onPreviewLink={() => { setIsShareModalOpen(false); setIsPreviewing(true); }}
             />
+            <AIStudioSheet isOpen={isAiSheetOpen} onClose={() => setIsAiSheetOpen(false)}>
+                <GemSidebar onAIPolish={handleAIPolish} />
+            </AIStudioSheet>
         </>
     );
 };

@@ -3,8 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tappit AI</title>
+    <title>Tappit AI – One Tap. Zero Waste.</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ** CRITICAL FIX **: Added Tailwind config to define custom theme colors and fonts -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              bamboo: {
+                1: '#f0fdf4', 2: '#dcfce7', 3: '#bbf7d0', 4: '#86efac',
+                5: '#4ade80', 6: '#22c55e', 7: '#16a34a', 8: '#15803d',
+                9: '#166534', 10: '#14532d', 11: '#052e16', 12: '#062813',
+              },
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
     <!-- Sentry SDK (T-14) -->
     <script
       src="https://browser.sentry-cdn.com/7.54.0/bundle.tracing.min.js"
@@ -22,7 +41,6 @@
       posthog.init('YOUR_POSTHOG_KEY', {api_host: 'https://app.posthog.com'})
     </script>
     <!-- Additional Libraries -->
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     
@@ -36,7 +54,12 @@
     "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
     "@jest/globals": "https://aistudiocdn.com/@jest/globals@^30.2.0",
     "@testing-library/react": "https://aistudiocdn.com/@testing-library/react@^16.3.0",
-    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.79.0"
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.79.0",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^11.3.19",
+    "react-intersection-observer": "https://aistudiocdn.com/react-intersection-observer@^9.13.0",
+    "isomorphic-fetch": "https://aistudiocdn.com/isomorphic-fetch@^3.0.0",
+    "tamagui": "https://aistudiocdn.com/tamagui@^1.136.1",
+    "@tamagui/config/": "https://aistudiocdn.com/@tamagui/config@^1.136.1/"
   }
 }
 </script>
@@ -44,77 +67,12 @@
     <!-- Google Fonts for Brand Kit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Lato:wght@400;700&family=Montserrat:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     
-    <style>
-        /* Custom Font Definition (T-12) */
-        @font-face {
-            font-family: 'Bamboo';
-            src: url('./fonts/Bamboo.woff2') format('woff2'); /* Assuming the font file is in public/fonts */
-            font-weight: normal;
-            font-style: normal;
-        }
-        
-        /* Custom Animations */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes morph { 0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; } }
-        @keyframes pulseGreen { 0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); } 50% { box-shadow: 0 0 0 12px rgba(22, 163, 74, 0); } }
-        @keyframes timelineItemIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .animate-fadeIn { animation: fadeIn 0.5s ease-in-out forwards; }
-        .animate-scaleIn { animation: scaleIn 0.5s ease-in-out forwards; }
-        .animate-morph { animation: morph 8s ease-in-out infinite; }
-        .animate-pulseGreen { animation: pulseGreen 2s infinite; }
-        .animate-timelineItemIn { animation: timelineItemIn 0.4s ease-out backwards; }
-
-        /* Perspective for 3D transforms */
-        .perspective-1000 { perspective: 1000px; }
-        .transform-style-3d { transform-style: preserve-3d; }
-    </style>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Roboto', 'sans-serif'],
-                        bamboo: ['Bamboo', 'sans-serif'],
-                        roboto: ['Roboto', 'sans-serif'],
-                        montserrat: ['Montserrat', 'sans-serif'],
-                        lato: ['Lato', 'sans-serif'],
-                    },
-                    colors: {
-                        bamboo: {
-                            1: '#f0fdf4',
-                            2: '#dcfce7',
-                            3: '#bbf7d0',
-                            4: '#86efac',
-                            5: '#4ade80',
-                            6: '#22c55e',
-                            7: '#16a34a',
-                            8: '#15803d',
-                            9: '#166534',
-                            10: '#14532d',
-                            11: '#144225',
-                            12: '#0b2f11',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style type="text/tailwindcss">
-        @layer base {
-            /* Apply custom font to headings (T-12) */
-            h1, h2, h3 {
-                font-family: theme('fontFamily.bamboo');
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-bamboo-12">
+<body>
     <div id="root"></div>
-    <script type="module" src="./index.tsx"></script>
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>

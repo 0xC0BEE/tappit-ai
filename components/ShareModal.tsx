@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 import Modal from './Modal.tsx';
 import GlassCard from './GlassCard.tsx';
 import HapticButton from './HapticButton.tsx';
@@ -18,7 +20,7 @@ interface ShareModalProps {
 }
 
 const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, fields, template, onPreviewLink }) => {
-    const [copied, setCopied] = useState(false);
+    const [copied, setCopied] = React.useState(false);
     const { playHaptic } = useHaptics();
     
     const publicUrl = `https://tappit.ai/card/${fields.find(f => f.label.toLowerCase() === 'name')?.value.replace(' ', '-').toLowerCase() || 'alex-bamboo'}`;

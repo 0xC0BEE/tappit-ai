@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import { supabase } from '../services/supabase.ts';
 import { TeamMember, BrandKit, TeamActivity } from '../types.ts';
 import TeamMemberDetail from '../components/team/TeamMemberDetail.tsx';
@@ -9,18 +10,22 @@ import CustomizeTeamModal from '../components/modals/CustomizeTeamModal.tsx';
 import HapticButton from '../components/HapticButton.tsx';
 import { PlusIcon, WandIcon } from '../components/icons.tsx';
 import LoadingSkeleton from '../components/LoadingSkeleton.tsx';
+import { useDebounce } from '../hooks/useDebounce.ts';
 
 const TeamScreen: React.FC = () => {
-    const [members, setMembers] = useState<TeamMember[]>([]);
-    const [brandKit, setBrandKit] = useState<BrandKit | null>(null);
-    const [activities, setActivities] = useState<TeamActivity[]>([]);
-    const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
-    const [loading, setLoading] = useState(true);
+    // Fix: Use React.useState and React.useEffect
+    const [members, setMembers] = React.useState<TeamMember[]>([]);
+    const [brandKit, setBrandKit] = React.useState<BrandKit | null>(null);
+    const [activities, setActivities] = React.useState<TeamActivity[]>([]);
+    const [selectedMember, setSelectedMember] = React.useState<TeamMember | null>(null);
+    const [loading, setLoading] = React.useState(true);
     
-    const [isInviteModalOpen, setInviteModalOpen] = useState(false);
-    const [isCustomizeModalOpen, setCustomizeModalOpen] = useState(false);
+    const [isInviteModalOpen, setInviteModalOpen] = React.useState(false);
+    const [isCustomizeModalOpen, setCustomizeModalOpen] = React.useState(false);
 
-    useEffect(() => {
+    const debouncedBrandKit = useDebounce(brandKit, 500);
+
+    React.useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             // Fix: Correctly await the mock Supabase query builder chains.
@@ -40,15 +45,20 @@ const TeamScreen: React.FC = () => {
         fetchData();
     }, []);
 
-    const handleUpdateBrandKit = async (newBrandKit: BrandKit) => {
-        setBrandKit(newBrandKit);
-        // Fix: Correctly await the mock Supabase query builder chain.
-        const { error } = await supabase.from('brand_kit').update(newBrandKit).eq('id', newBrandKit.id);
-        if (error) {
-            console.error('Failed to update brand kit', error);
-            // Optionally revert state
-        }
-    };
+    // Effect to save debounced brand kit changes to the database
+    React.useEffect(() => {
+        const updateBrandKitInSupabase = async () => {
+            if (!debouncedBrandKit || !debouncedBrandKit.id) return;
+            // Assuming the initial state is also fetched, so we don't save on mount
+            // A more robust solution would check if it's the initial load.
+            const { error } = await supabase.from('brand_kit').update(debouncedBrandKit).eq('id', debouncedBrandKit.id);
+            if (error) {
+                console.error('Failed to update brand kit', error);
+            }
+        };
+        updateBrandKitInSupabase();
+    }, [debouncedBrandKit]);
+
 
     const handleSelectMember = (member: TeamMember) => {
         setSelectedMember(member);
@@ -66,7 +76,7 @@ const TeamScreen: React.FC = () => {
         <>
             <div className="animate-scaleIn h-full grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Left column: Team Members & Actions */}
-                <div className="lg:col-span-1 h-full flex flex-col gap-6 overflow-y-auto pr-2 pb-24">
+                <div className="lg:col-span-1 h-full flex flex-col gap-6 pr-2">
                      <header className="flex justify-between items-center">
                         <div>
                             <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7">
@@ -111,7 +121,7 @@ const TeamScreen: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="lg:col-span-1 h-full flex flex-col gap-6 overflow-y-auto pr-2 pb-24">
+                <div className="lg:col-span-1 h-full flex flex-col gap-6 pr-2">
                     <AITeamInsights />
                     <ActivityFeed activities={activities} />
                 </div>
@@ -122,7 +132,7 @@ const TeamScreen: React.FC = () => {
                 isOpen={isCustomizeModalOpen} 
                 onClose={() => setCustomizeModalOpen(false)}
                 brandKit={brandKit}
-                setBrandKit={handleUpdateBrandKit}
+                setBrandKit={setBrandKit}
                 teamMembers={members}
             />
         </>

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 import useTilt from '../hooks/useTilt.ts';
 import { CardTemplate, CardField, FieldType } from '../types.ts';
 import { PlayIcon } from './icons.tsx';
@@ -14,8 +16,8 @@ interface TiltCardPreviewProps {
 
 const TiltCardPreview: React.FC<TiltCardPreviewProps> = ({ template, fields, name, title }) => {
     const { ref, style } = useTilt();
-    const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-    const [selectedVideoUrl, setSelectedVideoUrl] = useState('');
+    const [isVideoModalOpen, setIsVideoModalOpen] = React.useState(false);
+    const [selectedVideoUrl, setSelectedVideoUrl] = React.useState('');
 
     const handleVideoClick = (url: string) => {
         setSelectedVideoUrl(url);

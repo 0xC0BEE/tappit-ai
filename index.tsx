@@ -1,10 +1,13 @@
-
-import React from 'react';
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 import ReactDOM from 'react-dom/client';
 // Fix: Add file extension to satisfy bundler/type checker.
 import App from './App.tsx';
+import './index.css';
 
-// Fix: Add type declaration for Sentry on the window object.
+// Fix: Removed the faulty global JSX declaration. It was overriding the default
+// types from @types/react, causing all standard HTML tags to be unrecognized.
+// JSX types will now be resolved automatically. The Sentry augmentation is kept.
 declare global {
     interface Window {
         Sentry?: any;

@@ -1,4 +1,6 @@
-import React from 'react';
+
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 import { Tab } from '../types.ts';
 import HapticButton from './HapticButton.tsx';
 import { HomeIcon, CardIcon, NetworkIcon, ShoppingCartIcon, TeamIcon } from './icons.tsx';
@@ -19,7 +21,7 @@ const navItems = [
 
 const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, setActiveTab }) => {
     return (
-        <nav className="fixed bottom-0 left-0 right-0 h-20 bg-bamboo-12/50 backdrop-blur-lg border-t border-white/10 z-40 flex justify-around items-center">
+        <nav className="h-20 bg-bamboo-12/50 backdrop-blur-lg border-t border-white/10 z-40 flex justify-around items-center flex-shrink-0">
             {navItems.map(({ tab, Icon }) => {
                 const isActive = activeTab === tab;
                 return (

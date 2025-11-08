@@ -1,6 +1,10 @@
-import React from 'react';
+// Fix: Use type-only imports for React types to avoid potential namespace conflicts.
+import type { FC, CSSProperties } from 'react';
 
-// From App.tsx
+// NOTE: A previous attempt to fix JSX type recognition involved a global declaration in index.tsx.
+// This has been removed, as it was causing conflicts with the default types from @types/react.
+// Standard JSX types should now be resolved automatically by TypeScript.
+
 export enum Tab {
     Home = 'Home',
     Cards = 'Cards',
@@ -9,7 +13,6 @@ export enum Tab {
     Team = 'Team',
 }
 
-// From CardBuilderScreen.tsx and related components
 export enum FieldType {
     Text = 'text',
     Video = 'video',
@@ -19,7 +22,7 @@ export interface CardField {
     id: string;
     label: string;
     value: string;
-    icon: React.FC<{ className?: string }>;
+    icon: FC<{ className?: string; style?: CSSProperties }>;
     fieldType: FieldType;
 }
 
@@ -30,7 +33,6 @@ export interface CardTemplate {
     textColor: string;
 }
 
-// From NetworkScreen.tsx and related components
 export enum InteractionType {
     Tap = 'Tap',
     Meeting = 'Meeting',
@@ -45,9 +47,9 @@ export interface Interaction {
     id: string;
     type: InteractionType;
     date: string;
+    notes: string;
     event?: string;
     location?: string;
-    notes: string;
 }
 
 export interface Contact {
@@ -57,69 +59,87 @@ export interface Contact {
     company: string;
     photoUrl: string;
     lastInteraction: string;
+    relationshipHealth: number;
     leadScore: number;
     interactions: Interaction[];
 }
 
-// From GemSidebar.tsx and gems
-export interface GemDefinition {
-    id: string;
-    name: string;
-    description: string;
-    component: React.FC<any>;
-    isCustom?: boolean;
-    customComponentStr?: string;
-}
-
-// From gems/CustomGemComponent.tsx
-export interface CustomGemComponentProps {
-    jsxString?: string;
-}
-
-// From TeamScreen.tsx and related components
 export interface TeamMember {
     id: string;
     name: string;
-    avatarUrl: string;
     role: string;
+    avatarUrl: string;
     taps: number;
     connections: number;
     leadScore: number;
 }
 
+export interface BrandKit {
+    id: string;
+    primaryColor: string;
+    font: string;
+    logoUrl: string;
+}
+
 export interface TeamActivity {
     id: string;
-    member: {
-        name: string;
-        avatarUrl: string;
-    };
+    member: { name: string; avatarUrl: string; };
     action: string;
     target: string;
     timestamp: string;
 }
 
-export interface BrandKit {
-    id: string;
-    logoUrl: string;
-    primaryColor: string;
-    font: string;
+interface Stat {
+    current: number;
+    previous: number;
 }
 
-// From AnalyticsScreen.tsx and data/analytics.ts
 export interface AnalyticsData {
-    taps: { current: number; previous: number };
-    connections: { current: number; previous: number };
-    leadScore: { current: number; previous: number };
-    carbonSaved: { current: number; previous: number };
+    taps: Stat;
+    connections: Stat;
+    leadScore: Stat;
+    carbonSaved: Stat;
     tapLocations: { lat: number; lng: number; count: number }[];
-    performance: { name: string; taps: number }[];
 }
 
-// From ShopScreen.tsx
 export interface Product {
     id: string;
     name: string;
     description: string;
     price: number;
     imageUrl: string;
+}
+
+export interface GemDefinition {
+    id: string;
+    name: string;
+    description: string;
+    component: FC<any>;
+    isCustom?: boolean;
+    customComponentStr?: string;
+}
+
+export interface Meeting {
+    id: string;
+    title: string;
+    contactName: string;
+    contactId: string;
+    date: string;
+}
+
+export interface MeetingBriefing {
+    lastConversationSummary: string;
+    keyPersonalDetails: string[];
+    suggestedTalkingPoints: string[];
+}
+
+export interface CustomGemComponentProps {
+    jsxString?: string;
+}
+
+export interface WeeklyInsightReport {
+    performanceSummary: string;
+    keyHighlight: string;
+    aiCoaching: string;
+    goalForNextWeek: string;
 }

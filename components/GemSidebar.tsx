@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 import AIPolishButton from './AIPolishButton.tsx';
 import GlassCard from './GlassCard.tsx';
 import GemWrapper from '../gems/GemWrapper.tsx';
@@ -14,8 +15,8 @@ interface GemSidebarProps {
 }
 
 const GemSidebar: React.FC<GemSidebarProps> = ({ onAIPolish }) => {
-    const [gems, setGems] = useState<GemDefinition[]>(initialGems);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [gems, setGems] = React.useState<GemDefinition[]>(initialGems);
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
     
     const handleGemCreated = (newGem: GemDefinition) => {
         setGems(prevGems => [...prevGems, newGem]);
@@ -37,7 +38,7 @@ const GemSidebar: React.FC<GemSidebarProps> = ({ onAIPolish }) => {
                     <AIPolishButton onClick={onAIPolish} />
                 </div>
 
-                <div className="flex-grow space-y-3 overflow-y-auto pr-2 pb-20">
+                <div className="flex-grow space-y-3 pr-2 min-h-0">
                     {gems.map(gem => {
                         const GemComponent = gem.isCustom ? CustomGemComponent : gem.component;
                         const props = gem.isCustom ? { jsxString: gem.customComponentStr } : {};

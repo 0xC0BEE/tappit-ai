@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import { GoogleGenAI } from "@google/genai";
 import HapticButton from '../components/HapticButton.tsx';
 
 const IcebreakerGem: React.FC = () => {
-    const [icebreaker, setIcebreaker] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    // Fix: Use React.useState
+    const [icebreaker, setIcebreaker] = React.useState('');
+    const [isLoading, setIsLoading] = React.useState(false);
 
     const handleGenerate = async () => {
         setIsLoading(true);
@@ -18,6 +21,7 @@ const IcebreakerGem: React.FC = () => {
                     systemInstruction: "You suggest short, engaging icebreaker questions. Return only the question.",
                 }
             });
+            // Fix: Use response.text to get the generated content as per coding guidelines.
             setIcebreaker(response.text.trim());
         } catch (error) {
             console.error("Failed to generate icebreaker:", error);

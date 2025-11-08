@@ -1,12 +1,16 @@
 
-import React, { useRef, useEffect, useState } from 'react';
+
+// Fix: Use namespace import for React to ensure the JSX namespace is correctly resolved.
+import * as React from 'react';
 import { springTransition } from '../utils/spring.ts';
 
 const useTilt = (options = { max: 15, perspective: 1000, scale: 1.05 }) => {
-    const ref = useRef<HTMLDivElement>(null);
-    const [style, setStyle] = useState({});
+    // Fix: Use React.useRef and React.useState
+    const ref = React.useRef<HTMLDivElement>(null);
+    const [style, setStyle] = React.useState({});
 
-    useEffect(() => {
+    // Fix: Use React.useEffect
+    React.useEffect(() => {
         const element = ref.current;
         if (!element) return;
 

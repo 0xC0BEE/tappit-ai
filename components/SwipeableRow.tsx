@@ -1,10 +1,12 @@
-import React, { ReactNode } from 'react';
+
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 import useSwipe from '../hooks/useSwipe';
 
 interface SwipeableRowProps {
-    children: ReactNode;
-    leftActions?: ReactNode;
-    rightActions?: ReactNode;
+    children: React.ReactNode;
+    leftActions?: React.ReactNode;
+    rightActions?: React.ReactNode;
     onSwipeLeft?: () => void;
     onSwipeRight?: () => void;
 }

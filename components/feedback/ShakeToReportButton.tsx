@@ -1,4 +1,5 @@
-import React from 'react';
+// Fix: Change to namespace import to ensure JSX types are available globally.
+import * as React from 'react';
 
 // On native, this could wrap the app and listen for a shake gesture.
 // For this web-based example, it's a simple passthrough component.

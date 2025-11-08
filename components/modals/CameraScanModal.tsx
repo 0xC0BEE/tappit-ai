@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
@@ -10,10 +11,11 @@ interface CameraScanModalProps {
 }
 
 const CameraScanModal: React.FC<CameraScanModalProps> = ({ isOpen, onClose }) => {
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const streamRef = useRef<MediaStream | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    // Fix: Use React.useRef, React.useState, React.useEffect
+    const videoRef = React.useRef<HTMLVideoElement>(null);
+    const streamRef = React.useRef<MediaStream | null>(null);
+    const [error, setError] = React.useState<string | null>(null);
+    const [isLoading, setIsLoading] = React.useState(true);
 
     const stopCamera = () => {
         if (streamRef.current) {
@@ -22,7 +24,7 @@ const CameraScanModal: React.FC<CameraScanModalProps> = ({ isOpen, onClose }) =>
         }
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         const startCamera = async () => {
             setError(null);
             setIsLoading(true);

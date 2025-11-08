@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 import { WandIcon } from './icons.tsx';
 import HapticButton from './HapticButton.tsx';
 import { useHaptics, HapticPattern } from '../hooks/useHaptics.ts';
@@ -14,7 +16,7 @@ interface AIPolishButtonProps {
 }
 
 const AIPolishButton: React.FC<AIPolishButtonProps> = ({ onClick }) => {
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = React.useState(false);
     const { playHaptic } = useHaptics();
 
     const handleClick = async () => {

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
@@ -15,13 +17,14 @@ interface AssignCardModalProps {
 }
 
 const AssignCardModal: React.FC<AssignCardModalProps> = ({ isOpen, onClose, teamMembers }) => {
-    const [templates, setTemplates] = useState<CardTemplate[]>([]);
-    const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-    const [selectedTemplate, setSelectedTemplate] = useState<CardTemplate | null>(null);
-    const [status, setStatus] = useState<'idle' | 'assigning' | 'success'>('idle');
+    // Fix: Use React.useState and React.useEffect
+    const [templates, setTemplates] = React.useState<CardTemplate[]>([]);
+    const [selectedMembers, setSelectedMembers] = React.useState<string[]>([]);
+    const [selectedTemplate, setSelectedTemplate] = React.useState<CardTemplate | null>(null);
+    const [status, setStatus] = React.useState<'idle' | 'assigning' | 'success'>('idle');
     const { playHaptic } = useHaptics();
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (isOpen) {
             const fetchTemplates = async () => {
                 // Fix: Correctly await the mock Supabase query builder.

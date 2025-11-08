@@ -1,5 +1,6 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 
 // Assuming QRCode is loaded from CDN and available on window
 declare global {
@@ -13,10 +14,10 @@ interface AnimatedQRProps {
 }
 
 const AnimatedQR: React.FC<AnimatedQRProps> = ({ value }) => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [showTexture, setShowTexture] = useState(false);
+    const canvasRef = React.useRef<HTMLCanvasElement>(null);
+    const [showTexture, setShowTexture] = React.useState(false);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (canvasRef.current && window.QRCode) {
             window.QRCode.toCanvas(canvasRef.current, value, {
                 width: 256,
@@ -31,7 +32,7 @@ const AnimatedQR: React.FC<AnimatedQRProps> = ({ value }) => {
         }
     }, [value]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const timer = setTimeout(() => setShowTexture(true), 4000);
         return () => clearTimeout(timer);
     }, []);

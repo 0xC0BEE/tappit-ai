@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
 import { CertificateIcon, CloseIcon, ShareIcon, TreeIcon } from '../icons.tsx';
@@ -20,7 +22,8 @@ interface PlantTreeCertificateProps {
 const PlantTreeCertificate: React.FC<PlantTreeCertificateProps> = ({ isOpen, onClose }) => {
     const { playHaptic } = useHaptics();
 
-    useEffect(() => {
+    // Fix: Use React.useEffect
+    React.useEffect(() => {
         if (isOpen) {
             playHaptic(HapticPattern.Success);
             // Trigger confetti when the modal opens

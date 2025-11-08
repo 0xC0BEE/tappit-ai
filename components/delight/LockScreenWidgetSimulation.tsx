@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import GlassCard from '../GlassCard.tsx';
 import AnimatedQR from '../AnimatedQR.tsx';
 import HapticButton from '../HapticButton.tsx';
 import { useHaptics, HapticPattern } from '../../hooks/useHaptics.ts';
 
 const LockScreenWidgetSimulation: React.FC = () => {
-    const [isNearby, setIsNearby] = useState(false);
+    // Fix: Use React.useState
+    const [isNearby, setIsNearby] = React.useState(false);
     const { playHaptic } = useHaptics();
 
     const handleSimulateNearby = () => {

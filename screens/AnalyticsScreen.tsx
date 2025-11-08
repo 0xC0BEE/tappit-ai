@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+
+// Fix: Use namespace import for React to resolve JSX type errors.
+import * as React from 'react';
 import { supabase } from '../services/supabase.ts';
 import { AnalyticsData } from '../types.ts';
 import StatCard from '../components/analytics/StatCard.tsx';
@@ -7,10 +9,11 @@ import TapHeatmap from '../components/analytics/TapHeatmap.tsx';
 import { LeafIcon, NetworkIcon, TrendingUpIcon, ZapIcon } from '../components/icons.tsx';
 
 const AnalyticsScreen: React.FC = () => {
-    const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
-    const [loading, setLoading] = useState(true);
+    // Fix: Use React.useState and React.useEffect
+    const [analyticsData, setAnalyticsData] = React.useState<AnalyticsData | null>(null);
+    const [loading, setLoading] = React.useState(true);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const fetchAnalytics = async () => {
             setLoading(true);
             // In a real app, this might be a call to a Supabase Edge Function

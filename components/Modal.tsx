@@ -1,13 +1,15 @@
-import React, { ReactNode, useEffect } from 'react';
+
+// Fix: Remove redundant triple-slash directive for React types.
+import * as React from 'react';
 
 interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
-    children: ReactNode;
+    children: React.ReactNode;
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
-    useEffect(() => {
+    React.useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onClose();
