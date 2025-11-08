@@ -1,15 +1,11 @@
-import type { FC, CSSProperties } from 'react';
 
-// NOTE: Standard JSX types should now be resolved automatically by TypeScript.
+import * as React from 'react';
 
-export enum Tab {
-    Home = 'Home',
-    Cards = 'Cards',
-    Network = 'Network',
-    Shop = 'Shop',
-    Team = 'Team',
-}
+// Navigation
+export type NavItem = 'Home' | 'Cards' | 'Network' | 'Team' | 'More';
+export type Screen = 'Home' | 'Cards' | 'Network' | 'Team' | 'Analytics' | 'Shop' | 'Settings' | 'Profile' | 'Calendly Roulette' | 'Referral Giveaway';
 
+// Card
 export enum FieldType {
     Text = 'text',
     Video = 'video',
@@ -19,7 +15,7 @@ export interface CardField {
     id: string;
     label: string;
     value: string;
-    icon: FC<{ className?: string; style?: CSSProperties }>;
+    icon: React.ElementType;
     fieldType: FieldType;
 }
 
@@ -30,6 +26,7 @@ export interface CardTemplate {
     textColor: string;
 }
 
+// Contacts & Interactions
 export enum InteractionType {
     Tap = 'Tap',
     Meeting = 'Meeting',
@@ -42,11 +39,11 @@ export enum InteractionType {
 
 export interface Interaction {
     id: string;
-    type: InteractionType;
     date: string;
-    notes: string;
+    type: InteractionType;
     event?: string;
     location?: string;
+    notes: string;
 }
 
 export interface Contact {
@@ -56,13 +53,27 @@ export interface Contact {
     company: string;
     photoUrl: string;
     lastInteraction: string;
-    relationshipHealth: number;
     leadScore: number;
     interactions: Interaction[];
-    // FIX: Add optional 'calendly_url' property to support the Calendly Roulette feature. This property exists in the mock data.
-    calendly_url?: string | null;
+    calendly_url?: string;
+    relationshipHealth: number;
 }
 
+// AI Studio & Gems
+export interface GemDefinition {
+    id: string;
+    name: string;
+    description: string;
+    component: React.FC<any>;
+    isCustom?: boolean;
+    customComponentStr?: string;
+}
+
+export interface CustomGemComponentProps {
+    jsxString: string | undefined;
+}
+
+// Team
 export interface TeamMember {
     id: string;
     name: string;
@@ -73,6 +84,17 @@ export interface TeamMember {
     leadScore: number;
 }
 
+export interface TeamActivity {
+    id: string;
+    member: {
+        name: string;
+        avatarUrl: string;
+    };
+    action: string;
+    target: string;
+    timestamp: string;
+}
+
 export interface BrandKit {
     id: string;
     primaryColor: string;
@@ -80,27 +102,7 @@ export interface BrandKit {
     logoUrl: string;
 }
 
-export interface TeamActivity {
-    id: string;
-    member: { name: string; avatarUrl: string; };
-    action: string;
-    target: string;
-    timestamp: string;
-}
-
-interface Stat {
-    current: number;
-    previous: number;
-}
-
-export interface AnalyticsData {
-    taps: Stat;
-    connections: Stat;
-    leadScore: Stat;
-    carbonSaved: Stat;
-    tapLocations: { lat: number; lng: number; count: number }[];
-}
-
+// Shop
 export interface Product {
     id: string;
     name: string;
@@ -109,20 +111,12 @@ export interface Product {
     imageUrl: string;
 }
 
-export interface GemDefinition {
-    id: string;
-    name: string;
-    description: string;
-    component: FC<any>;
-    isCustom?: boolean;
-    customComponentStr?: string;
-}
-
+// Meetings & AI Briefings
 export interface Meeting {
     id: string;
-    title: string;
-    contactName: string;
     contactId: string;
+    contactName: string;
+    title: string;
     date: string;
 }
 
@@ -132,13 +126,12 @@ export interface MeetingBriefing {
     suggestedTalkingPoints: string[];
 }
 
-export interface CustomGemComponentProps {
-    jsxString?: string;
-}
-
-export interface WeeklyInsightReport {
-    performanceSummary: string;
-    keyHighlight: string;
-    aiCoaching: string;
-    goalForNextWeek: string;
+// Leaderboard
+export interface GreenStreakUser {
+    user_id: string;
+    streak_count: number;
+    user: {
+        name: string;
+        avatarUrl: string;
+    };
 }

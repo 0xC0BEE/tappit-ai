@@ -1,46 +1,38 @@
 import * as React from 'react';
-import { Tab } from '../types.ts';
+import { HomeIcon, CardIcon, NetworkIcon, UsersIcon, MoreIcon } from './icons.tsx';
 import HapticButton from './HapticButton.tsx';
-import { HomeIcon, CardIcon, NetworkIcon, ShoppingCartIcon, TeamIcon } from './icons.tsx';
-import { springTransition } from '../utils/spring.ts';
+import { NavItem } from '../types.ts';
 
 interface BottomNavBarProps {
-    activeTab: Tab;
-    setActiveTab: (tab: Tab) => void;
+    activeTab: NavItem;
+    setActiveTab: (tab: NavItem) => void;
 }
 
-const navItems = [
-    { tab: Tab.Home, Icon: HomeIcon },
-    { tab: Tab.Cards, Icon: CardIcon },
-    { tab: Tab.Network, Icon: NetworkIcon },
-    { tab: Tab.Shop, Icon: ShoppingCartIcon },
-    { tab: Tab.Team, Icon: TeamIcon },
+const navItems: { id: NavItem; icon: React.ElementType; label: string; }[] = [
+    { id: 'Home', icon: HomeIcon, label: 'Home' },
+    { id: 'Cards', icon: CardIcon, label: 'Cards' },
+    { id: 'Network', icon: NetworkIcon, label: 'Network' },
+    { id: 'Team', icon: UsersIcon, label: 'Team' },
+    { id: 'More', icon: MoreIcon, label: 'More' },
 ];
 
 const BottomNavBar: React.FC<BottomNavBarProps> = ({ activeTab, setActiveTab }) => {
     return (
-        <nav className="h-20 bg-bamboo-12/50 backdrop-blur-lg border-t border-white/10 z-40 flex justify-around items-center flex-shrink-0">
-            {navItems.map(({ tab, Icon }) => {
-                const isActive = activeTab === tab;
-                return (
+        <nav className="fixed bottom-0 left-0 right-0 bg-bamboo-12/80 backdrop-blur-xl border-t border-white/10 z-30">
+            <div className="flex justify-around items-center h-20">
+                {navItems.map(({ id, icon: Icon, label }) => (
                     <HapticButton 
-                        key={tab} 
-                        onClick={() => setActiveTab(tab)}
-                        className="relative flex flex-col items-center justify-center w-16 h-16 text-gray-400"
+                        key={id}
+                        onClick={() => setActiveTab(id)}
+                        className="flex flex-col items-center justify-center space-y-1 w-1/5"
                     >
-                        <Icon className={`w-7 h-7 transition-colors ${isActive ? 'text-bamboo-7' : ''}`} />
-                        <span className={`text-xs mt-1 transition-opacity ${isActive ? 'opacity-100 text-white' : 'opacity-0'}`}>
-                            {tab}
+                        <Icon className={`w-7 h-7 transition-colors ${activeTab === id ? 'text-bamboo-8' : 'text-gray-400'}`} />
+                        <span className={`text-xs font-medium transition-colors ${activeTab === id ? 'text-white' : 'text-gray-400'}`}>
+                            {label}
                         </span>
-                        {isActive && (
-                            <div 
-                                style={{ ...springTransition, transform: 'translateY(4px) scale(1)' }}
-                                className="absolute -bottom-1 w-8 h-1 bg-bamboo-8 rounded-full"
-                            ></div>
-                        )}
                     </HapticButton>
-                );
-            })}
+                ))}
+            </div>
         </nav>
     );
 };

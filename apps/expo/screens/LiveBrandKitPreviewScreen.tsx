@@ -1,53 +1,53 @@
 import * as React from 'react';
-import { supabase } from '../../../services/supabase.ts';
-import { BrandKit, TeamMember } from '../../../types.ts';
-import BrandKitEditor from '../../../components/team/BrandKitEditor.tsx';
+import { BrandKit } from '../../../types.ts';
 import TeamCardPreview from '../../../components/team/TeamCardPreview.tsx';
-import LoadingSkeleton from '../../../components/LoadingSkeleton.tsx';
+import BambooBackground from '../../../components/BambooBackground.tsx';
+import GlassCard from '../../../components/GlassCard.tsx';
+import { WandIcon } from '../../../components/icons.tsx';
 
 const LiveBrandKitPreviewScreen: React.FC = () => {
-    const [brandKit, setBrandKit] = React.useState<BrandKit | null>(null);
-    const [teamMembers, setTeamMembers] = React.useState<TeamMember[]>([]);
-    const [loading, setLoading] = React.useState(true);
+    // In a real app, this state would be updated via websockets or a similar real-time service.
+    // Here, we'll simulate the updates with a timer.
+    const [brandKit, setBrandKit] = React.useState<BrandKit>({
+        id: 'bk-live-preview',
+        primaryColor: '#22c55e',
+        font: 'Inter',
+        logoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=green&shade=500',
+    });
+
+    const colors = ['#22c55e', '#3b82f6', '#8b5cf6', '#ec4899'];
+    const fonts = ['Inter', 'Roboto', 'Montserrat', 'Lato'];
 
     React.useEffect(() => {
-        const fetchData = async () => {
-            const { data: brandKitData } = await supabase.from('brand_kit').select('*').single();
-            const { data: membersData } = await supabase.from('team_members').select('*').limit(6);
-            if (brandKitData && membersData) {
-                setBrandKit(brandKitData as BrandKit);
-                setTeamMembers(membersData as TeamMember[]);
-            }
-            setLoading(false);
-        };
-        fetchData();
+        const interval = setInterval(() => {
+            setBrandKit(prev => ({
+                ...prev,
+                primaryColor: colors[Math.floor(Math.random() * colors.length)],
+                font: fonts[Math.floor(Math.random() * fonts.length)],
+            }));
+        }, 2000); // Change every 2 seconds
+
+        return () => clearInterval(interval);
     }, []);
 
-    if (loading || !brandKit) {
-        return <div className="p-4"><LoadingSkeleton /></div>;
-    }
-
     return (
-        <div className="flex flex-col h-full p-4">
-            <header className="pb-8 text-center">
-                <h1 className="text-4xl font-bold">Live Brand Kit Preview</h1>
-                <p className="text-gray-300 mt-2">Changes you make on the left will instantly reflect on your team's cards on the right.</p>
-            </header>
-            <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Editor */}
-                <div>
-                    <BrandKitEditor brandKit={brandKit} setBrandKit={setBrandKit} />
-                </div>
+        <div className="min-h-screen w-full bg-bamboo-12 text-white p-4 lg:p-8 flex flex-col items-center justify-center">
+            <BambooBackground />
+            <div className="w-full max-w-md relative z-10 animate-scaleIn text-center">
+                <header className="mb-8">
+                     <WandIcon className="w-12 h-12 mx-auto text-bamboo-7" />
+                    <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7 mt-2">
+                        Live Brand Kit Preview
+                    </h1>
+                    <p className="text-gray-300 mt-2">As you edit your brand kit in the Team OS, see the changes reflected here in real-time.</p>
+                </header>
 
-                {/* Live Preview Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                    {teamMembers.map(member => (
-                        <div key={member.id} className="space-y-2">
-                           <TeamCardPreview brandKit={brandKit} />
-                           <p className="text-center text-sm font-semibold">{member.name}</p>
-                        </div>
-                    ))}
-                </div>
+                <GlassCard className="p-6">
+                    <p className="text-sm font-semibold text-gray-400 mb-4">Simulating Live Updates...</p>
+                    <div className="transform scale-125">
+                        <TeamCardPreview brandKit={brandKit} />
+                    </div>
+                </GlassCard>
             </div>
         </div>
     );

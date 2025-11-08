@@ -1,177 +1,172 @@
-// This file mocks the Supabase client for local development without needing a live backend.
-// It simulates the Supabase API, including authentication and database queries.
+// FIX: Full mock implementation of the Supabase client to resolve all "Failed to fetch" errors
+// and make the application fully functional offline.
 
-import { BriefcaseIcon, EmailIcon, PhoneIcon, LinkIcon, MapPinIcon, PlayIcon, HomeIcon, CardIcon, NetworkIcon, TeamIcon } from '../components/icons.tsx';
-import { FieldType, InteractionType } from '../types.ts';
+import { Session } from '@supabase/supabase-js';
 
-const MOCK_DATA = {
-    'card_fields': [
-        { id: 'f1', label: 'Name', value: 'Alex Bamboo', icon: BriefcaseIcon, fieldType: FieldType.Text },
-        { id: 'f2', label: 'Title', value: 'Senior Strategic Advisor', icon: BriefcaseIcon, fieldType: FieldType.Text },
-        { id: 'f3', label: 'Company', value: 'Tappit AI', icon: BriefcaseIcon, fieldType: FieldType.Text },
-        { id: 'f4', label: 'Email', value: 'alex.b@tappit.ai', icon: EmailIcon, fieldType: FieldType.Text },
-        { id: 'f5', label: 'Phone', value: '+1 234 567 8900', icon: PhoneIcon, fieldType: FieldType.Text },
-        { id: 'f6', label: 'Website', value: 'tappit.ai', icon: LinkIcon, fieldType: FieldType.Text },
-        { id: 'f7', label: 'Location', value: 'Bamboo Forest, Bali', icon: MapPinIcon, fieldType: FieldType.Text },
-        { id: 'f8', label: 'Intro Video', value: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', icon: PlayIcon, fieldType: FieldType.Video },
+// --- MOCK DATA ---
+const MOCK_USER = {
+    id: 'user-123',
+    email: 'alex.bamboo@tappit.ai',
+    // ... other user properties
+};
+
+// FIX: Add missing properties (refresh_token, expires_in, expires_at) to satisfy the Session type from @supabase/supabase-js.
+const MOCK_SESSION: Session = {
+    access_token: 'mock-access-token',
+    token_type: 'bearer',
+    user: MOCK_USER as any,
+    refresh_token: 'mock-refresh-token',
+    expires_in: 3600,
+    expires_at: Math.floor(Date.now() / 1000) + 3600,
+};
+
+const mockData: { [key: string]: any[] } = {
+    contacts: [
+        { id: 'c1', name: 'Jane Doe', title: 'CEO', company: 'Innovate Inc.', photoUrl: 'https://i.pravatar.cc/150?u=jane', lastInteraction: '2 days ago', leadScore: 92, interactions: [], calendly_url: 'https://calendly.com/jane-doe', relationshipHealth: 40 },
+        { id: 'c2', name: 'Michael Scott', title: 'Regional Manager', company: 'Dunder Mifflin', photoUrl: 'https://i.pravatar.cc/150?u=michael', lastInteraction: '1 week ago', leadScore: 78, interactions: [], calendly_url: 'https://calendly.com/michael-scott', relationshipHealth: 20 },
+        { id: 'c3', name: 'Dwight Schrute', title: 'Assistant to the RM', company: 'Dunder Mifflin', photoUrl: 'https://i.pravatar.cc/150?u=dwight', lastInteraction: '3 weeks ago', leadScore: 65, interactions: [] },
     ],
-    'card_templates': [
-        { id: 't1', name: 'Emerald', className: 'bg-emerald-500', textColor: 'text-white' },
-        { id: 't2', name: 'Forest', className: 'bg-green-800', textColor: 'text-white' },
-        { id: 't3', name: 'Mint', className: 'bg-green-200', textColor: 'text-black' },
-        { id: 't4', name: 'Charcoal', className: 'bg-gray-800', textColor: 'text-white' },
-        { id: 't5', name: 'Jade', className: 'bg-teal-600', textColor: 'text-white' },
+    interactions: [
+        { id: 'int-1', contact_id: 'c1', type: 'Meeting', date: '2025-11-03', event: 'TechCrunch Disrupt', notes: 'Discussed potential partnership and API integration.' },
+        { id: 'int-2', contact_id: 'c1', type: 'Email', date: '2025-11-04', notes: 'Sent follow-up email with deck.' },
     ],
-    'contacts': [
-        { id: 'c1', name: 'John Smith', title: 'Lead Developer', company: 'CodeCrafters', photoUrl: 'https://api.dicebear.com/8.x/initials/png?seed=John%20Smith', lastInteraction: '2 days ago', relationshipHealth: 0.9, leadScore: 92, last_interaction_date: '2025-11-03', calendly_url: 'https://calendly.com/john-smith', interactions: [
-            { id: 'i1', type: InteractionType.Meeting, date: '2024-07-22', notes: 'Discussed technical integration.', event: 'Project Kickoff', location: 'Virtual' }
-        ]},
-        { id: 'c2', name: 'Jane Doe', title: 'Product Manager', company: 'Innovate Inc.', photoUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Jane%20Doe', lastInteraction: '1 week ago', relationshipHealth: 0.6, leadScore: 78, last_interaction_date: '2025-10-28', calendly_url: 'https://calendly.com/jane-doe', interactions: [] },
-        { id: 'c3', name: 'Michael Scott', title: 'Regional Manager', company: 'Dunder Mifflin', photoUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Michael%20Scott', lastInteraction: '3 weeks ago', relationshipHealth: 0.2, leadScore: 45, last_interaction_date: '2025-10-14', calendly_url: null, interactions: [] },
+    team_members: [
+        { id: 'tm1', name: 'Alex Bamboo', role: 'Admin', avatarUrl: 'https://i.pravatar.cc/150?u=alex', taps: 124, connections: 82, leadScore: 88 },
+        { id: 'tm2', name: 'Jane Doe', role: 'Member', avatarUrl: 'https://i.pravatar.cc/150?u=jane', taps: 98, connections: 65, leadScore: 75 },
     ],
-    'team_members': [
-        { id: 'tm1', name: 'Alex Bamboo', role: 'Admin', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Alex%20Bamboo', taps: 128, connections: 42, leadScore: 85 },
-        { id: 'tm2', name: 'Michael Scott', role: 'Member', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Michael%20Scott', taps: 75, connections: 21, leadScore: 70 },
-        { id: 'tm3', name: 'Jane Doe', role: 'Member', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Jane%20Doe', taps: 98, connections: 33, leadScore: 79 },
+    // FIX: Converted object to an array of one object to match the expected data structure for tables queried with `.single()`.
+    brand_kit: [{ id: 'bk1', primaryColor: '#22c55e', font: 'Inter', logoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=green&shade=500' }],
+    card_templates: [
+        { id: 't1', name: 'Bamboo', className: 'bg-gradient-to-br from-bamboo-9 to-bamboo-11', textColor: 'text-white' },
+        { id: 't2', name: 'Glass', className: 'bg-black/20 backdrop-blur-xl border border-white/10', textColor: 'text-white' },
+        { id: 't3', name: 'Mint', className: 'bg-gradient-to-br from-green-200 to-green-400', textColor: 'text-bamboo-11' },
     ],
-    'brand_kit': [{ id: 'bk1', primaryColor: '#22c55e', font: 'Roboto', logoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=green&shade=500' }],
-    'team_activities': [
-        { id: 'a1', member: { name: 'Michael Scott', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Michael%20Scott' }, action: 'added a new contact', target: 'David Wallace', timestamp: '2 hours ago' },
+    // FIX: Converted object to an array of one object to match the expected data structure for tables queried with `.single()`.
+    analytics: [{ id: 'a1', carbonSaved: { current: 18.2, previous: 15.1 } }],
+    meetings: [
+        { id: 'm1', contactId: 'c1', contactName: 'Jane Doe', title: 'Q4 Strategy Sync', date: '2025-11-10' },
     ],
-    'analytics': [{ taps: {current: 128, previous: 95}, connections: {current: 42, previous: 30}, leadScore: {current: 85, previous: 81}, carbonSaved: {current: 2.7, previous: 1.9}, tapLocations: [{lat: 34.05, lng: -118.24, count: 20}] }],
-    'meetings': [
-        { id: 'm1', title: 'Project Kickoff', contactName: 'John Smith', contactId: 'c1', date: 'Tomorrow' },
-        { id: 'm2', title: 'Q3 Planning', contactName: 'Jane Doe', contactId: 'c2', date: 'In 3 days' },
+    green_streaks: [
+        { user_id: 'tm1', streak_count: 42, user: { name: 'Alex Bamboo', avatarUrl: 'https://i.pravatar.cc/150?u=alex' } },
+        { user_id: 'tm2', streak_count: 35, user: { name: 'Jane Doe', avatarUrl: 'https://i.pravatar.cc/150?u=jane' } },
     ],
-    'interactions': [
-         { id: 'i1', contact_id: 'c1', type: InteractionType.Meeting, date: '2024-07-22', notes: 'Discussed technical integration.', event: 'Project Kickoff', location: 'Virtual' }
-    ],
-    'green_streaks': [
-        { user_id: 'tm1', streak_count: 42, user: { name: 'Alex Bamboo', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Alex%20Bamboo'} },
-        { user_id: 'tm2', streak_count: 21, user: { name: 'Michael Scott', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Michael%20Scott'} },
-        { user_id: 'tm3', streak_count: 35, user: { name: 'Jane Doe', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Jane%20Doe'} },
-    ],
-    'trees_planted': [
-        { id: 'tree1', user_id: 'tm1', certificate_id: 'TP-84B2-XYZ', location: 'Madagascar', timestamp: '2025-10-20T10:00:00Z' }
-    ],
-    'referrals': [
-        { id: 'r1', referrer_id: 'tm1', referred_id: 'user_a', status: 'completed' },
-        { id: 'r2', referrer_id: 'tm1', referred_id: 'user_b', status: 'completed' },
-        { id: 'r3', referrer_id: 'tm1', referred_id: 'user_c', status: 'pending' },
-    ],
-    // Empty tables for new features
-    'nfc_bumps': [],
-    'wallet_passes': [],
+    team_activities: [
+      { id: 'act1', member: { name: 'Alex Bamboo', avatarUrl: 'https://i.pravatar.cc/150?u=alex' }, action: 'added a new contact', target: 'Jane Doe', timestamp: '2 hours ago' },
+      { id: 'act2', member: { name: 'Jane Doe', avatarUrl: 'https://i.pravatar.cc/150?u=jane' }, action: 'updated the brand kit', target: '', timestamp: 'Yesterday' },
+    ]
 };
 
 
-// MOCK SUPABASE CLIENT
-let authStateChangeCallback: ((event: string, session: any) => void) | null = null;
+// --- MOCK SUPABASE CLIENT ---
 
-const mockAuth = {
-    getSession: () => Promise.resolve({ data: { session: JSON.parse(localStorage.getItem('session') || 'null') } }),
-    onAuthStateChange: (_callback: (event: string, session: any) => void) => {
-        authStateChangeCallback = _callback;
-        // Initial check
-        setTimeout(() => {
-            const session = JSON.parse(localStorage.getItem('session') || 'null');
-            if (authStateChangeCallback) authStateChangeCallback(session ? 'INITIAL_SESSION' : 'SIGNED_OUT', session);
-        }, 100);
-        
-        return { data: { subscription: { unsubscribe: () => { authStateChangeCallback = null; } } } };
-    },
-    signUp: async ({ email, password }: {email: string, password?: string}) => {
-        const session = { user: { id: 'user-123', email }, access_token: 'fake-token' };
-        localStorage.setItem('session', JSON.stringify(session));
-        if (authStateChangeCallback) authStateChangeCallback('SIGNED_IN', session);
-        return { data: { session }, error: null };
-    },
-    signInWithPassword: async ({ email, password }: {email: string, password?: string}) => {
-        const session = { user: { id: 'user-123', email }, access_token: 'fake-token' };
-        localStorage.setItem('session', JSON.stringify(session));
-        if (authStateChangeCallback) authStateChangeCallback('SIGNED_IN', session);
-        return { data: { session }, error: null };
-    },
-};
+const createMockQueryBuilder = (table: string, initialData: any[]) => {
+    let query = [...initialData];
+    let isSingle = false;
 
-
-// Chainable query builder mock
-class QueryBuilder {
-    private data: any[];
-    private isSingle: boolean = false;
-    private filters: ((item: any) => boolean)[] = [];
-    private limitCount: number | null = null;
-    private ordering: { column: string, ascending: boolean } | null = null;
-
-    constructor(data: any[]) {
-        this.data = [...data]; // Create a shallow copy to avoid modifying original mock data
-    }
-
-    select(columns = '*') {
-        // In this mock, select does nothing as we return all columns.
-        return this;
-    }
-    
-    update(dataToUpdate: any) {
-        // In a real mock, you'd find the item and update it.
-        // For this type fix, we just need the method to exist and be chainable.
-        return this;
-    }
-
-    eq(column: string, value: any) {
-        this.filters.push(item => item[column] === value);
-        return this;
-    }
-
-    order(column: string, { ascending } = { ascending: true }) {
-        this.ordering = { column, ascending };
-        return this;
-    }
-
-    limit(count: number) {
-        this.limitCount = count;
-        return this;
-    }
-
-    single() {
-        this.isSingle = true;
-        return this;
-    }
-
-    // This makes the class "then-able" like a promise
-    then(resolve: (value: { data: any, error: any }) => void) {
-        setTimeout(() => {
-            let result = this.data;
-        
-            this.filters.forEach(filter => {
-                result = result.filter(filter);
+    const queryBuilder = {
+        select(columns = '*') {
+            // Mock select is a passthrough for now, as we return all columns
+            return this;
+        },
+        eq(column: string, value: any) {
+            query = query.filter(item => item[column] === value);
+            return this;
+        },
+        order(column: string, { ascending = true }: { ascending?: boolean } = {}) {
+            query.sort((a, b) => {
+                if (a[column] < b[column]) return ascending ? -1 : 1;
+                if (a[column] > b[column]) return ascending ? 1 : -1;
+                return 0;
             });
+            return this;
+        },
+        limit(count: number) {
+            query = query.slice(0, count);
+            return this;
+        },
+        single() {
+            isSingle = true;
+            return this;
+        },
+        update(newData: any) {
+             // In a real mock, you'd apply this update based on a subsequent .eq() call
+             console.log(`Mock update on ${table} with:`, newData);
+             // For this mock, we assume it succeeds
+             return this;
+        },
+        // Make the object "thenable" to be await-able
+        async then(resolve: (value: any) => void, reject: (reason?: any) => void) {
+            try {
+                await new Promise(res => setTimeout(res, 200 + Math.random() * 800)); // Simulate network delay
+                
+                let result;
+                if (isSingle) {
+                    result = query.length > 0 ? query[0] : null;
+                } else {
+                    result = query;
+                }
 
-            if (this.ordering) {
-                const { column, ascending } = this.ordering;
-                result.sort((a, b) => {
-                    if (a[column] < b[column]) return ascending ? -1 : 1;
-                    if (a[column] > b[column]) return ascending ? 1 : -1;
-                    return 0;
-                });
-            }
-    
-            if (this.limitCount !== null) {
-                result = result.slice(0, this.limitCount);
-            }
-    
-            if (this.isSingle) {
-                resolve({ data: result[0] || null, error: null });
-            } else {
                 resolve({ data: result, error: null });
+            } catch (error) {
+                reject({ data: null, error });
             }
-        }, 50); // Simulate network delay
-    }
-}
+        },
+    };
+    return queryBuilder;
+};
 
+
+// Mock implementation of the Supabase client
 export const supabase = {
-    auth: mockAuth,
-    from: (tableName: keyof typeof MOCK_DATA) => {
-        return new QueryBuilder(MOCK_DATA[tableName] || []);
+    auth: {
+        async getSession() {
+            const session = localStorage.getItem('supabase.auth.token') ? MOCK_SESSION : null;
+            return Promise.resolve({ data: { session }, error: null });
+        },
+        onAuthStateChange(callback: (event: string, session: Session | null) => void) {
+            const handleStorageChange = () => {
+                const session = localStorage.getItem('supabase.auth.token') ? MOCK_SESSION : null;
+                callback('SIGNED_IN', session);
+            };
+            window.addEventListener('storage', handleStorageChange);
+            // Initial call
+            const session = localStorage.getItem('supabase.auth.token') ? MOCK_SESSION : null;
+            callback('INITIAL_SESSION', session);
+
+            return {
+                data: {
+                    subscription: {
+                        unsubscribe: () => {
+                            window.removeEventListener('storage', handleStorageChange);
+                        },
+                    },
+                },
+            };
+        },
+        async signInWithPassword({ email, password }: any) {
+            if (email && password) {
+                localStorage.setItem('supabase.auth.token', JSON.stringify(MOCK_SESSION));
+                window.dispatchEvent(new Event('storage')); // Manually trigger listener
+                return Promise.resolve({ data: { session: MOCK_SESSION }, error: null });
+            }
+            return Promise.resolve({ data: { session: null }, error: new Error('Invalid login credentials') });
+        },
+        async signUp({ email, password }: any) {
+             if (email && password) {
+                // In this mock, signUp also logs the user in immediately.
+                localStorage.setItem('supabase.auth.token', JSON.stringify(MOCK_SESSION));
+                window.dispatchEvent(new Event('storage'));
+                return Promise.resolve({ data: { session: MOCK_SESSION }, error: null });
+            }
+            return Promise.resolve({ data: { session: null }, error: new Error('Invalid sign up details') });
+        },
+        async signOut() {
+            localStorage.removeItem('supabase.auth.token');
+            window.dispatchEvent(new Event('storage'));
+            return Promise.resolve({ error: null });
+        },
+    },
+    from(table: string) {
+        return createMockQueryBuilder(table, mockData[table] || []);
     },
 };

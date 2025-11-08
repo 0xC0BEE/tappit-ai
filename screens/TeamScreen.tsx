@@ -1,138 +1,108 @@
+
 import * as React from 'react';
 import { supabase } from '../services/supabase.ts';
 import { TeamMember, BrandKit, TeamActivity } from '../types.ts';
-import TeamMemberDetail from '../components/team/TeamMemberDetail.tsx';
 import AITeamInsights from '../components/team/AITeamInsights.tsx';
 import ActivityFeed from '../components/team/ActivityFeed.tsx';
+import GlassCard from '../components/GlassCard.tsx';
+import HapticButton from '../components/HapticButton.tsx';
+import { PlusIcon, SettingsIcon } from '../components/icons.tsx';
+import TeamMemberDetail from '../components/team/TeamMemberDetail.tsx';
 import InviteTeamModal from '../components/modals/InviteTeamModal.tsx';
 import CustomizeTeamModal from '../components/modals/CustomizeTeamModal.tsx';
-import HapticButton from '../components/HapticButton.tsx';
-import { PlusIcon, WandIcon } from '../components/icons.tsx';
-import LoadingSkeleton from '../components/LoadingSkeleton.tsx';
-import { useDebounce } from '../hooks/useDebounce.ts';
 
 const TeamScreen: React.FC = () => {
-    const [members, setMembers] = React.useState<TeamMember[]>([]);
-    const [brandKit, setBrandKit] = React.useState<BrandKit | null>(null);
+    const [teamMembers, setTeamMembers] = React.useState<TeamMember[]>([]);
     const [activities, setActivities] = React.useState<TeamActivity[]>([]);
+    const [brandKit, setBrandKit] = React.useState<BrandKit | null>(null);
     const [selectedMember, setSelectedMember] = React.useState<TeamMember | null>(null);
-    const [loading, setLoading] = React.useState(true);
-    
     const [isInviteModalOpen, setInviteModalOpen] = React.useState(false);
     const [isCustomizeModalOpen, setCustomizeModalOpen] = React.useState(false);
-
-    const debouncedBrandKit = useDebounce(brandKit, 500);
+    const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const { data: membersData, error: membersError } = await supabase.from('team_members').select('*');
-            const { data: brandKitData, error: brandKitError } = await supabase.from('brand_kit').select('*').single();
-            const { data: activitiesData, error: activitiesError } = await supabase.from('team_activities').select('*').limit(5);
+            const [membersRes, brandKitRes, activitiesRes] = await Promise.all([
+                supabase.from('team_members').select('*'),
+                supabase.from('brand_kit').select('*').single(),
+                supabase.from('team_activities').select('*'),
+            ]);
 
-            if (membersError || brandKitError || activitiesError) {
-                console.error(membersError || brandKitError || activitiesError);
-            } else {
-                setMembers(membersData as TeamMember[]);
-                setBrandKit(brandKitData as BrandKit);
-                setActivities(activitiesData as TeamActivity[]);
-            }
+            if (membersRes.data) setTeamMembers(membersRes.data as TeamMember[]);
+            if (brandKitRes.data) setBrandKit(brandKitRes.data as BrandKit);
+            if (activitiesRes.data) setActivities(activitiesRes.data as TeamActivity[]);
+
             setLoading(false);
         };
         fetchData();
     }, []);
 
-    // Effect to save debounced brand kit changes to the database
-    React.useEffect(() => {
-        const updateBrandKitInSupabase = async () => {
-            if (!debouncedBrandKit || !debouncedBrandKit.id) return;
-            // Assuming the initial state is also fetched, so we don't save on mount
-            // A more robust solution would check if it's the initial load.
-            const { error } = await supabase.from('brand_kit').update(debouncedBrandKit).eq('id', debouncedBrandKit.id);
-            if (error) {
-                console.error('Failed to update brand kit', error);
-            }
-        };
-        updateBrandKitInSupabase();
-    }, [debouncedBrandKit]);
-
-
-    const handleSelectMember = (member: TeamMember) => {
-        setSelectedMember(member);
-    };
+    if (loading) {
+        return <div className="flex items-center justify-center h-full">Loading team data...</div>;
+    }
 
     if (selectedMember) {
         return <TeamMemberDetail member={selectedMember} onBack={() => setSelectedMember(null)} />;
     }
 
-    if (loading || !brandKit) {
-        return <div className="flex flex-col gap-4 p-4">{Array.from({length: 5}).map((_, i) => <LoadingSkeleton key={i}/>)}</div>
-    }
-
     return (
         <>
-            <div className="animate-scaleIn h-full grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Left column: Team Members & Actions */}
-                <div className="lg:col-span-1 h-full flex flex-col gap-6 pr-2">
-                     <header className="flex justify-between items-center">
-                        <div>
-                            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7">
-                                Team
-                            </h1>
-                            <p className="text-gray-300 text-lg mt-2">Manage your organization.</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                             <HapticButton 
-                                onClick={() => setCustomizeModalOpen(true)}
-                                className="flex items-center space-x-2 bg-white/10 text-white font-semibold py-2 px-4 rounded-full shadow-lg"
-                            >
-                                <WandIcon className="w-5 h-5" />
-                                <span>Customize</span>
-                            </HapticButton>
-                            <HapticButton 
-                                onClick={() => setInviteModalOpen(true)}
-                                className="flex items-center space-x-2 bg-bamboo-8 text-white font-bold py-2 px-4 rounded-full shadow-lg shadow-bamboo-8/30"
-                            >
-                                <PlusIcon className="w-5 h-5" />
-                                <span>Invite</span>
-                            </HapticButton>
-                        </div>
-                    </header>
-                    
-                    <div className="space-y-3">
-                        {members.map(member => (
-                             <HapticButton key={member.id} onClick={() => handleSelectMember(member)} className="w-full text-left">
-                                <div className="bg-black/20 p-3 rounded-lg w-full hover:bg-black/30 transition-colors flex items-center space-x-4">
-                                     <img src={member.avatarUrl} alt={member.name} className="w-12 h-12 rounded-full" />
-                                     <div className="flex-grow">
-                                        <p className="font-bold text-white">{member.name}</p>
-                                        <p className="text-sm text-gray-300">{member.role}</p>
-                                     </div>
-                                     <div className="text-right">
-                                        <p className="text-xs text-gray-400">Taps</p>
-                                        <p className="font-semibold text-white">{member.taps}</p>
-                                     </div>
-                                </div>
-                             </HapticButton>
-                        ))}
+            <div className="animate-scaleIn h-full flex flex-col">
+                <header className="pb-8 flex justify-between items-start">
+                    <div>
+                        <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7">
+                            Team OS
+                        </h1>
+                        <p className="text-gray-300 text-lg mt-2">Manage your team's networking efforts.</p>
                     </div>
-                </div>
-
-                <div className="lg:col-span-1 h-full flex flex-col gap-6 pr-2">
-                    <AITeamInsights />
-                    <ActivityFeed activities={activities} />
+                    <div className="flex items-center space-x-2">
+                         <HapticButton onClick={() => setCustomizeModalOpen(true)} className="p-2 bg-white/10 rounded-full text-white"><SettingsIcon className="w-6 h-6"/></HapticButton>
+                         <HapticButton onClick={() => setInviteModalOpen(true)} className="flex items-center space-x-2 bg-bamboo-8 text-white font-semibold py-2 px-4 rounded-full text-sm">
+                            <PlusIcon className="w-4 h-4" />
+                            <span>Invite</span>
+                        </HapticButton>
+                    </div>
+                </header>
+                
+                <div className="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto pr-2 pb-24">
+                    <div className="space-y-6">
+                        <AITeamInsights />
+                        <ActivityFeed activities={activities} />
+                    </div>
+                    <div className="space-y-6">
+                        <GlassCard className="p-4">
+                            <h2 className="text-xl font-bold text-white mb-4">Team Members ({teamMembers.length})</h2>
+                            <ul className="space-y-3">
+                                {teamMembers.map(member => (
+                                    <li key={member.id}>
+                                        <HapticButton onClick={() => setSelectedMember(member)} className="w-full text-left flex items-center p-2 rounded-lg hover:bg-white/10">
+                                            <img src={member.avatarUrl} alt={member.name} className="w-10 h-10 rounded-full" />
+                                            <div className="ml-3">
+                                                <p className="font-semibold text-white">{member.name}</p>
+                                                <p className="text-sm text-gray-400">{member.role}</p>
+                                            </div>
+                                        </HapticButton>
+                                    </li>
+                                ))}
+                            </ul>
+                        </GlassCard>
+                    </div>
                 </div>
             </div>
             
             <InviteTeamModal isOpen={isInviteModalOpen} onClose={() => setInviteModalOpen(false)} />
-            <CustomizeTeamModal 
-                isOpen={isCustomizeModalOpen} 
-                onClose={() => setCustomizeModalOpen(false)}
-                brandKit={brandKit}
-                setBrandKit={setBrandKit}
-                teamMembers={members}
-            />
+            {brandKit && (
+                 <CustomizeTeamModal 
+                    isOpen={isCustomizeModalOpen} 
+                    onClose={() => setCustomizeModalOpen(false)}
+                    brandKit={brandKit}
+                    setBrandKit={setBrandKit}
+                    teamMembers={teamMembers}
+                />
+            )}
         </>
     );
 };
+
 export default TeamScreen;

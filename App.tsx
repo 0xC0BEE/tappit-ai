@@ -1,14 +1,13 @@
-import * as React from 'react';
-import { Tab } from './types.ts';
-import { useTheme } from './hooks/useTheme.ts';
-import { supabase } from './services/supabase.ts';
-import { Session } from '@supabase/supabase-js';
 
-// Components
+import * as React from 'react';
+import { Session } from '@supabase/supabase-js';
+import { supabase } from './services/supabase.ts';
+import { useTheme } from './hooks/useTheme.ts';
+import { NavItem, Screen } from './types.ts';
+
 import BambooBackground from './components/BambooBackground.tsx';
 import BottomNavBar from './components/BottomNavBar.tsx';
-import ShakeToReportButton from './components/feedback/ShakeToReportButton.tsx';
-import FeedbackModal from './components/feedback/FeedbackModal.tsx';
+import MoreSheet from './components/MoreSheet.tsx';
 
 // Screens
 import IntroScreen from './screens/IntroScreen.tsx';
@@ -17,22 +16,44 @@ import HomeScreen from './screens/HomeScreen.tsx';
 import CardBuilderScreen from './screens/CardBuilderScreen.tsx';
 import NetworkScreen from './screens/NetworkScreen.tsx';
 import TeamScreen from './screens/TeamScreen.tsx';
+import PlaceholderScreen from './screens/PlaceholderScreen.tsx';
+import PublicCardScreen from './screens/PublicCardScreen.tsx';
+import AnalyticsScreen from './screens/AnalyticsScreen.tsx';
 import ShopScreen from './screens/ShopScreen.tsx';
+import SettingsScreen from './screens/SettingsScreen.tsx';
+import ProfileScreen from './screens/ProfileScreen.tsx';
+
+// 10x Feature Screens
+import CalendlyRouletteGem from './apps/expo/screens/CalendlyRouletteGem.tsx';
+import ReferralGiveawayScreen from './apps/expo/screens/ReferralGiveawayScreen.tsx';
+
 
 const App: React.FC = () => {
     useTheme();
     const [session, setSession] = React.useState<Session | null>(null);
-    const [isOnboarding, setIsOnboarding] = React.useState(true);
-    const [activeTab, setActiveTab] = React.useState<Tab>(Tab.Home);
-    const [isFeedbackModalOpen, setFeedbackModalOpen] = React.useState(false);
+    const [loading, setLoading] = React.useState(true);
+    const [showOnboarding, setShowOnboarding] = React.useState(false);
+    const [activeTab, setActiveTab] = React.useState<NavItem>('Home');
+    const [isMoreSheetOpen, setMoreSheetOpen] = React.useState(false);
+    
+    // This state will manage which "More" screen or special screen is active
+    const [activeScreen, setActiveScreen] = React.useState<Screen>('Home');
+
+    const [isPreviewMode, setIsPreviewMode] = React.useState(false);
 
     React.useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-        });
-
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
+            
+            // Check if it's the user's first time
+            const hasOnboarded = localStorage.getItem('hasOnboarded');
+            if (session && !hasOnboarded) {
+                setShowOnboarding(true);
+            } else {
+                setShowOnboarding(false);
+            }
+
+            setLoading(false);
         });
 
         return () => subscription.unsubscribe();
@@ -40,60 +61,83 @@ const App: React.FC = () => {
 
     const handleOnboardingComplete = () => {
         localStorage.setItem('hasOnboarded', 'true');
-        setIsOnboarding(false);
+        setShowOnboarding(false);
     };
 
-    React.useEffect(() => {
-        if (localStorage.getItem('hasOnboarded') === 'true') {
-            setIsOnboarding(false);
-        }
-    }, [session]);
-
-    const renderActiveScreen = () => {
-        switch (activeTab) {
-            case Tab.Home:
-                return <HomeScreen />;
-            case Tab.Cards:
-                return <CardBuilderScreen />;
-            case Tab.Network:
-                return <NetworkScreen onOpenFeedback={() => setFeedbackModalOpen(false)} />;
-            case Tab.Shop:
-                return <ShopScreen />;
-            case Tab.Team:
-                return <TeamScreen />;
-            default:
-                return <HomeScreen />;
+    const handleSetActiveTab = (tab: NavItem) => {
+        if (tab === 'More') {
+            setMoreSheetOpen(true);
+        } else {
+            setActiveTab(tab);
+            setActiveScreen(tab); // Reset to the main tab's screen
         }
     };
     
-    // If there is no session, render the full-page IntroScreen
-    if (!session) {
-        return <IntroScreen />;
-    }
+    const handleNavigate = (screen: Screen) => {
+        setActiveScreen(screen);
+        setMoreSheetOpen(false);
+        // If the navigated screen corresponds to a main tab, set that tab active
+        if (['Home', 'Cards', 'Network', 'Team'].includes(screen)) {
+            setActiveTab(screen as NavItem);
+        } else {
+            // Otherwise, keep the last active tab visually selected
+        }
+    };
 
-    // If there is a session, render the main app experience
+    const renderContent = () => {
+        if (loading) {
+            return <div className="flex items-center justify-center h-full"><div className="w-16 h-16 bg-white/10 animate-morph rounded-full"></div></div>;
+        }
+
+        if (!session) {
+            return <IntroScreen />;
+        }
+        
+        if (showOnboarding) {
+            return <OnboardingScreen onComplete={handleOnboardingComplete} />;
+        }
+        
+        if (isPreviewMode) {
+             return <PublicCardScreen onBack={() => setIsPreviewMode(false)} />;
+        }
+
+        let CurrentScreen: React.FC | null = null;
+        switch (activeScreen) {
+            case 'Home': CurrentScreen = HomeScreen; break;
+            case 'Cards': CurrentScreen = () => <CardBuilderScreen onPreview={() => setIsPreviewMode(true)} />; break;
+            case 'Network': CurrentScreen = NetworkScreen; break;
+            case 'Team': CurrentScreen = TeamScreen; break;
+            case 'Analytics': CurrentScreen = AnalyticsScreen; break;
+            case 'Shop': CurrentScreen = ShopScreen; break;
+            case 'Settings': CurrentScreen = SettingsScreen; break;
+            case 'Profile': CurrentScreen = ProfileScreen; break;
+            case 'Calendly Roulette': CurrentScreen = CalendlyRouletteGem; break;
+            case 'Referral Giveaway': CurrentScreen = ReferralGiveawayScreen; break;
+            default: CurrentScreen = () => <PlaceholderScreen title={activeScreen} />;
+        }
+
+        return (
+             <div className="relative h-full w-full max-w-7xl mx-auto p-4 lg:p-8">
+                <CurrentScreen />
+            </div>
+        );
+    };
+
+    const showAppShell = !loading && session && !showOnboarding && !isPreviewMode;
+
     return (
-        <ShakeToReportButton>
-            <main className="h-screen w-screen overflow-hidden bg-bamboo-12 text-white font-sans flex flex-col">
-                <BambooBackground />
-                <div className="flex-grow flex flex-col overflow-hidden animate-fadeIn">
-                    {isOnboarding ? (
-                        <OnboardingScreen onComplete={handleOnboardingComplete} />
-                    ) : (
-                        <>
-                            <div className="flex-grow overflow-y-auto relative p-4 lg:p-8 pt-0 lg:pt-0">
-                                {renderActiveScreen()}
-                            </div>
-                            <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} />
-                        </>
-                    )}
-                </div>
-                <FeedbackModal 
-                  isOpen={isFeedbackModalOpen} 
-                  onClose={() => setFeedbackModalOpen(false)} 
-                />
+        <div className="bg-bamboo-12 text-white font-sans min-h-screen h-screen flex flex-col items-center justify-center overflow-hidden">
+            <BambooBackground />
+            <main className="relative z-10 h-full w-full overflow-y-auto pb-20">
+                {renderContent()}
             </main>
-        </ShakeToReportButton>
+            {showAppShell && (
+                 <>
+                    <BottomNavBar activeTab={activeTab} setActiveTab={handleSetActiveTab} />
+                    <MoreSheet isOpen={isMoreSheetOpen} onClose={() => setMoreSheetOpen(false)} onNavigate={handleNavigate} />
+                 </>
+            )}
+        </div>
     );
 };
 
