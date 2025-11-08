@@ -1,4 +1,3 @@
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
@@ -11,7 +10,6 @@ interface InviteTeamModalProps {
 }
 
 const InviteTeamModal: React.FC<InviteTeamModalProps> = ({ isOpen, onClose }) => {
-    // Fix: Use React.useState
     const [email, setEmail] = React.useState('');
 
     const handleSendInvite = () => {

@@ -5,9 +5,7 @@
 // Note: To run this test, a testing environment like Jest with JSDOM
 // and React Testing Library would need to be configured for the project.
 
-// Fix: Import test runner globals to satisfy TypeScript.
 import { describe, test, expect, jest } from '@jest/globals';
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from '../App.tsx'; // Assuming the test runner is configured for this relative path

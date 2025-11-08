@@ -1,5 +1,3 @@
-
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
@@ -13,7 +11,6 @@ interface ExportModalProps {
 }
 
 const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose }) => {
-    // Fix: Use React.useState
     const [format, setFormat] = React.useState('CSV');
     const [includeInteractions, setIncludeInteractions] = React.useState(true);
     const [isExporting, setIsExporting] = React.useState(false);

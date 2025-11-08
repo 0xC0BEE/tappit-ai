@@ -1,5 +1,3 @@
-
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import { supabase } from '../services/supabase.ts';
 import { AnalyticsData } from '../types.ts';
@@ -9,7 +7,6 @@ import TapHeatmap from '../components/analytics/TapHeatmap.tsx';
 import { LeafIcon, NetworkIcon, TrendingUpIcon, ZapIcon } from '../components/icons.tsx';
 
 const AnalyticsScreen: React.FC = () => {
-    // Fix: Use React.useState and React.useEffect
     const [analyticsData, setAnalyticsData] = React.useState<AnalyticsData | null>(null);
     const [loading, setLoading] = React.useState(true);
 
@@ -18,7 +15,6 @@ const AnalyticsScreen: React.FC = () => {
             setLoading(true);
             // In a real app, this might be a call to a Supabase Edge Function
             // that aggregates data. For now, we'll fetch from a table.
-            // Fix: Correctly await the mock Supabase query builder chain.
             const { data, error } = await supabase.from('analytics').select('*').single();
 
             if (error) {

@@ -1,5 +1,3 @@
-
-// Fix: Change to namespace import to ensure JSX types are available globally.
 import * as React from 'react';
 import GlassCard from '../GlassCard.tsx';
 

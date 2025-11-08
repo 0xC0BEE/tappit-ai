@@ -1,5 +1,3 @@
-
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import { GoogleGenAI, Type } from '@google/genai';
 import Modal from '../Modal.tsx';
@@ -16,7 +14,6 @@ interface AddInteractionModalProps {
 }
 
 const AddInteractionModal: React.FC<AddInteractionModalProps> = ({ isOpen, onClose, onAddInteraction, contactName }) => {
-    // Fix: Use React.useState
     const [step, setStep] = React.useState<'input' | 'confirm'>('input');
     const [naturalInput, setNaturalInput] = React.useState('');
     const [parsedInteraction, setParsedInteraction] = React.useState<Partial<Interaction> | null>(null);
@@ -49,7 +46,6 @@ const AddInteractionModal: React.FC<AddInteractionModalProps> = ({ isOpen, onClo
                 }
             });
             
-            // Fix: Use response.text to get the generated content as per coding guidelines.
             const parsedJson = JSON.parse(response.text);
             setParsedInteraction(parsedJson);
             setStep('confirm');

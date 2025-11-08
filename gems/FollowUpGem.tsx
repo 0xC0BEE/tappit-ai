@@ -1,4 +1,3 @@
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import { GoogleGenAI } from "@google/genai";
 import HapticButton from '../components/HapticButton.tsx';
@@ -7,7 +6,6 @@ import SetReminderModal from '../components/modals/SetReminderModal.tsx';
 import { useHaptics, HapticPattern } from '../hooks/useHaptics.ts';
 
 const FollowUpGem: React.FC = () => {
-    // Fix: Use React.useState
     const [followUp, setFollowUp] = React.useState('');
     const [isLoading, setIsLoading] = React.useState(false);
     const [isReminderModalOpen, setReminderModalOpen] = React.useState(false);
@@ -26,7 +24,6 @@ const FollowUpGem: React.FC = () => {
                     systemInstruction: "You generate concise follow-up messages. Return only the message text.",
                 }
             });
-            // Fix: Use response.text to get the generated content as per coding guidelines.
             setFollowUp(response.text.trim());
         } catch (error) {
             console.error("Failed to generate follow-up:", error);

@@ -49,8 +49,8 @@ const TheTapSection: React.FC = () => {
                             />
                         </div>
                     </div>
-                    {/* Right Column: Visual */}
-                    <div className={`relative h-96 lg:h-[32rem] ${getAnimationClass('delay-500')}`}>
+                    {/* Right Column: Visual (Hidden on mobile) */}
+                    <div className={`relative h-96 lg:h-[32rem] hidden lg:block ${getAnimationClass('delay-500')}`}>
                         <GlassCard className="absolute top-0 left-0 w-64 p-4 animate-float">
                             <p className="text-sm font-semibold text-white">New Contact: Jane Doe</p>
                             <p className="text-xs text-gray-400">Innovate Inc.</p>

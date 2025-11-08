@@ -1,4 +1,3 @@
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import { supabase } from '../services/supabase.ts';
 import { TeamMember, BrandKit, TeamActivity } from '../types.ts';
@@ -13,7 +12,6 @@ import LoadingSkeleton from '../components/LoadingSkeleton.tsx';
 import { useDebounce } from '../hooks/useDebounce.ts';
 
 const TeamScreen: React.FC = () => {
-    // Fix: Use React.useState and React.useEffect
     const [members, setMembers] = React.useState<TeamMember[]>([]);
     const [brandKit, setBrandKit] = React.useState<BrandKit | null>(null);
     const [activities, setActivities] = React.useState<TeamActivity[]>([]);
@@ -28,7 +26,6 @@ const TeamScreen: React.FC = () => {
     React.useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            // Fix: Correctly await the mock Supabase query builder chains.
             const { data: membersData, error: membersError } = await supabase.from('team_members').select('*');
             const { data: brandKitData, error: brandKitError } = await supabase.from('brand_kit').select('*').single();
             const { data: activitiesData, error: activitiesError } = await supabase.from('team_activities').select('*').limit(5);

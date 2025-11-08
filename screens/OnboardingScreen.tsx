@@ -1,11 +1,6 @@
-
-// Fix: Remove redundant triple-slash directive for React types.
 import * as React from 'react';
-// Fix: Add file extension to satisfy bundler/type checker.
-import LottiePlayer from '../components/LottiePlayer.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
+import PulsingTreeAnimation from '../components/PulsingTreeAnimation.tsx';
 import HapticButton from '../components/HapticButton.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
 import AnimatedQR from '../components/AnimatedQR.tsx';
 import { trackOnboardingComplete } from '../services/analytics.ts';
 
@@ -29,8 +24,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
             case 1:
                 return (
                     <div className="flex flex-col items-center justify-center text-center animate-fadeIn">
-                        <LottiePlayer 
-                            src="https://lottie.host/8c64c243-1577-4743-8a14-46d2df0f671c/sK4y33a7gT.json" // A growing leaf animation
+                        <PulsingTreeAnimation 
                             className="w-64 h-64"
                         />
                         <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-bamboo-2 to-bamboo-7 mt-4">

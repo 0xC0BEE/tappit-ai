@@ -1,5 +1,3 @@
-
-// Fix: Remove redundant triple-slash directive for React types.
 import * as React from 'react';
 import Modal from './Modal.tsx';
 import GlassCard from './GlassCard.tsx';

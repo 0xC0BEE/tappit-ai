@@ -1,4 +1,3 @@
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import { supabase } from '../../services/supabase.ts';
 import { TeamMember, Contact } from '../../types.ts';
@@ -13,7 +12,6 @@ interface TeamMemberDetailProps {
 }
 
 const TeamMemberDetail: React.FC<TeamMemberDetailProps> = ({ member, onBack }) => {
-    // Fix: Use React.useState and React.useEffect
     const [connections, setConnections] = React.useState<Contact[]>([]);
     const [loading, setLoading] = React.useState(true);
 
@@ -22,7 +20,6 @@ const TeamMemberDetail: React.FC<TeamMemberDetailProps> = ({ member, onBack }) =
             setLoading(true);
             // In a real schema, you'd likely filter contacts by team_member_id
             // For now, we'll fetch a few contacts to simulate.
-            // Fix: Correctly await the mock Supabase query builder chain.
             const { data, error } = await supabase
                 .from('contacts')
                 .select('*')

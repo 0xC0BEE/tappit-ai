@@ -1,18 +1,14 @@
-
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import { LeafIcon } from '../components/icons.tsx';
 import { supabase } from '../services/supabase.ts';
 
 const CarbonSavedGem: React.FC = () => {
-    // Fix: Use React.useState and React.useEffect
     const [carbonSaved, setCarbonSaved] = React.useState(0);
 
     React.useEffect(() => {
         const fetchCarbonSaved = async () => {
             // This is a simplified example. In a real app, you might fetch this
             // from a user's profile or an analytics table.
-            // Fix: Correctly await the mock Supabase query builder chain.
             const { data, error } = await supabase
                 .from('analytics')
                 .select('carbonSaved')

@@ -1,9 +1,5 @@
-
-// Fix: Change to namespace import to ensure JSX types are available globally.
 import * as React from 'react';
-// Fix: Add file extension to satisfy bundler/type checker.
 import Modal from '../Modal.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
 import GlassCard from '../GlassCard.tsx';
 
 interface FeedbackModalProps {

@@ -1,9 +1,6 @@
-// Fix: Use type-only imports for React types to avoid potential namespace conflicts.
 import type { FC, CSSProperties } from 'react';
 
-// NOTE: A previous attempt to fix JSX type recognition involved a global declaration in index.tsx.
-// This has been removed, as it was causing conflicts with the default types from @types/react.
-// Standard JSX types should now be resolved automatically by TypeScript.
+// NOTE: Standard JSX types should now be resolved automatically by TypeScript.
 
 export enum Tab {
     Home = 'Home',

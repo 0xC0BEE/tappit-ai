@@ -1,4 +1,3 @@
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import GlassCard from '../GlassCard.tsx';
 import HapticButton from '../HapticButton.tsx';
@@ -22,7 +21,6 @@ const fontOptions = [
 ];
 
 const BrandKitEditor: React.FC<BrandKitEditorProps> = ({ brandKit, setBrandKit }) => {
-    // Fix: Use React.useState, React.useRef, React.useEffect
     const [localColor, setLocalColor] = React.useState(brandKit.primaryColor);
     const debouncedColor = useDebounce(localColor, 300);
     const fileInputRef = React.useRef<HTMLInputElement>(null);

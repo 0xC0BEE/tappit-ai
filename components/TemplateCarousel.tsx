@@ -1,7 +1,3 @@
-// Fix: Provide a full implementation for TemplateCarousel.tsx.
-// This file was previously not a module, causing a global JSX namespace collision
-// that broke types for all standard HTML elements project-wide.
-// Making it a proper module by adding imports/exports resolves this issue.
 import * as React from 'react';
 import { CardTemplate } from '../types.ts';
 import { springTransitionAll } from '../utils/spring.ts';

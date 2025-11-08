@@ -1,5 +1,3 @@
-
-// Fix: Remove redundant triple-slash directive for React types.
 import * as React from 'react';
 
 interface GlassCardProps {

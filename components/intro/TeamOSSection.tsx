@@ -12,8 +12,8 @@ const TeamOSSection: React.FC = () => {
         <section ref={ref} id="teams" className="py-20 lg:py-32 bg-bamboo-11">
             <div className="container mx-auto px-4 lg:px-8">
                 <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-                    {/* Left Column: Visual */}
-                     <div className={`relative h-96 lg:h-[32rem] ${getAnimationClass('delay-500')}`}>
+                    {/* Left Column: Visual (Hidden on mobile) */}
+                     <div className={`relative h-96 lg:h-[32rem] hidden lg:block ${getAnimationClass('delay-500')}`}>
                         <GlassCard className="absolute top-1/4 left-0 w-80 p-4 animate-float">
                              <h3 className="text-base font-bold text-white">Team Performance</h3>
                              <p className="text-sm text-gray-300">Lead Score <span className="text-green-400">+12%</span></p>

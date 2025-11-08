@@ -1,5 +1,3 @@
-
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
@@ -17,7 +15,6 @@ interface AssignCardModalProps {
 }
 
 const AssignCardModal: React.FC<AssignCardModalProps> = ({ isOpen, onClose, teamMembers }) => {
-    // Fix: Use React.useState and React.useEffect
     const [templates, setTemplates] = React.useState<CardTemplate[]>([]);
     const [selectedMembers, setSelectedMembers] = React.useState<string[]>([]);
     const [selectedTemplate, setSelectedTemplate] = React.useState<CardTemplate | null>(null);
@@ -27,7 +24,6 @@ const AssignCardModal: React.FC<AssignCardModalProps> = ({ isOpen, onClose, team
     React.useEffect(() => {
         if (isOpen) {
             const fetchTemplates = async () => {
-                // Fix: Correctly await the mock Supabase query builder.
                 const { data, error } = await supabase.from('card_templates').select('*');
                 if (error) {
                     console.error("Error fetching templates:", error);

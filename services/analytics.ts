@@ -1,7 +1,6 @@
 // A simple wrapper for our PostHog analytics client.
 // This centralizes our tracking events and ensures we don't call PostHog if it hasn't loaded.
 
-// Fix: Add type declaration for posthog on the window object.
 declare global {
     interface Window {
         posthog?: any;

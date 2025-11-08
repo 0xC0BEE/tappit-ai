@@ -1,4 +1,3 @@
-// Fix: Remove redundant triple-slash directive for React types.
 import * as React from 'react';
 import { GoogleGenAI } from '@google/genai';
 import { supabase } from '../services/supabase.ts';
@@ -75,7 +74,6 @@ const NetworkScreen: React.FC<NetworkScreenProps> = ({ onOpenFeedback }) => {
                     systemInstruction: "You are a helpful assistant that summarizes relationship histories for a professional networking app. Be concise and insightful.",
                 }
             });
-            // Fix: Use response.text to get the generated content as per coding guidelines.
             setAiSummary(response.text.trim());
         } catch (error) {
             console.error("AI Summary generation failed:", error);

@@ -7,6 +7,14 @@ interface IntroHeaderProps {
 }
 
 const IntroHeader: React.FC<IntroHeaderProps> = ({ onLogin, onSignUp }) => {
+    const handleScroll = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+        e.preventDefault();
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+    
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-bamboo-12/50 backdrop-blur-lg">
             <div className="container mx-auto px-4 lg:px-8 py-3 flex justify-between items-center">
@@ -14,9 +22,9 @@ const IntroHeader: React.FC<IntroHeaderProps> = ({ onLogin, onSignUp }) => {
                     Tappit AI
                 </div>
                 <nav className="hidden md:flex items-center space-x-6 text-gray-300">
-                    <a href="#features" className="hover:text-white transition-colors">Features</a>
-                    <a href="#teams" className="hover:text-white transition-colors">Teams</a>
-                    <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+                    <a href="#features" onClick={(e) => handleScroll(e, 'features')} className="hover:text-white transition-colors">Features</a>
+                    <a href="#teams" onClick={(e) => handleScroll(e, 'teams')} className="hover:text-white transition-colors">Teams</a>
+                    <a href="#pricing" onClick={(e) => handleScroll(e, 'pricing')} className="hover:text-white transition-colors">Pricing</a>
                 </nav>
                 <div className="flex items-center space-x-4">
                     <HapticButton onClick={onLogin} className="text-gray-300 hover:text-white font-semibold transition-colors">

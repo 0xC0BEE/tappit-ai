@@ -1,5 +1,3 @@
-
-// Fix: Remove redundant triple-slash directive for React types.
 import * as React from 'react';
 import { Interaction, InteractionType } from '../types.ts';
 import { TapIcon, NetworkIcon, CallIcon, EmailIcon, EditIcon, PinIcon, TreeIcon } from './icons.tsx';

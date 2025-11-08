@@ -1,4 +1,3 @@
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
@@ -11,7 +10,6 @@ interface CameraScanModalProps {
 }
 
 const CameraScanModal: React.FC<CameraScanModalProps> = ({ isOpen, onClose }) => {
-    // Fix: Use React.useRef, React.useState, React.useEffect
     const videoRef = React.useRef<HTMLVideoElement>(null);
     const streamRef = React.useRef<MediaStream | null>(null);
     const [error, setError] = React.useState<string | null>(null);

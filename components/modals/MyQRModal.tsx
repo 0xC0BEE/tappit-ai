@@ -1,4 +1,3 @@
-// Fix: Change to namespace import to ensure JSX types are available globally.
 import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';

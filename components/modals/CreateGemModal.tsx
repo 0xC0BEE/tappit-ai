@@ -1,16 +1,9 @@
-
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import { GoogleGenAI, Type } from "@google/genai";
-// Fix: Add file extension to satisfy bundler/type checker.
 import Modal from '../Modal.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
 import GlassCard from '../GlassCard.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
 import HapticButton from '../HapticButton.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
 import { CloseIcon, WandIcon } from '../icons.tsx';
-// Fix: Add file extension to satisfy bundler/type checker.
 import { GemDefinition } from '../../types.ts';
 
 interface CreateGemModalProps {
@@ -20,7 +13,6 @@ interface CreateGemModalProps {
 }
 
 const CreateGemModal: React.FC<CreateGemModalProps> = ({ isOpen, onClose, onGemCreated }) => {
-    // Fix: Use React.useState
     const [prompt, setPrompt] = React.useState('');
     const [name, setName] = React.useState('');
     const [isLoading, setIsLoading] = React.useState(false);
@@ -32,7 +24,6 @@ const CreateGemModal: React.FC<CreateGemModalProps> = ({ isOpen, onClose, onGemC
         }
         setIsLoading(true);
         try {
-            // Fix: Initialize GoogleGenAI with named apiKey parameter as per coding guidelines.
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-pro', // Use a powerful model for code generation.
@@ -42,7 +33,6 @@ const CreateGemModal: React.FC<CreateGemModalProps> = ({ isOpen, onClose, onGemC
                 }
             });
             
-            // Fix: Use response.text to get the generated content as per coding guidelines.
             const jsxString = response.text.trim();
 
             const newGem: GemDefinition = {

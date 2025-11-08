@@ -1,4 +1,3 @@
-// Fix: Change to namespace import to ensure React types are correctly resolved.
 import * as React from 'react';
 
 /**

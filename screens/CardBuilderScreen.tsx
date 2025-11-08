@@ -1,4 +1,3 @@
-// Fix: Remove redundant triple-slash directive for React types.
 import * as React from 'react';
 import { GoogleGenAI } from '@google/genai';
 import { supabase } from '../services/supabase.ts';
@@ -43,8 +42,6 @@ const CardBuilderScreen: React.FC = () => {
         fetchData();
     }, []);
     
-    // Fix: Wrap all state handlers in useCallback to prevent unnecessary re-renders in child components,
-    // which was the root cause of the input focus and dropdown selection bugs.
     const handleUpdateField = React.useCallback((id: string, value: string) => {
         setFields(prevFields => 
             prevFields.map(field => field.id === id ? { ...field, value } : field)

@@ -1,15 +1,10 @@
-
-
-// Fix: Use namespace import for React to ensure the JSX namespace is correctly resolved.
 import * as React from 'react';
 import { springTransition } from '../utils/spring.ts';
 
 const useTilt = (options = { max: 15, perspective: 1000, scale: 1.05 }) => {
-    // Fix: Use React.useRef and React.useState
     const ref = React.useRef<HTMLDivElement>(null);
     const [style, setStyle] = React.useState({});
 
-    // Fix: Use React.useEffect
     React.useEffect(() => {
         const element = ref.current;
         if (!element) return;
@@ -40,7 +35,6 @@ const useTilt = (options = { max: 15, perspective: 1000, scale: 1.05 }) => {
 
         return () => {
             element.removeEventListener('mousemove', handleMouseMove);
-            // Fix: Pass the handler function `handleMouseLeave` instead of the string 'mouseleave'.
             element.removeEventListener('mouseleave', handleMouseLeave);
         };
     }, [options.max, options.perspective, options.scale]);

@@ -34,14 +34,21 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onSignUp }) => {
                     >
                         Get Started for Free
                     </HapticButton>
-                    <HapticButton className="w-full sm:w-auto flex items-center justify-center space-x-2 text-white font-semibold">
+                    <HapticButton 
+                        onClick={() => alert('Product demo coming soon!')}
+                        className="w-full sm:w-auto flex items-center justify-center space-x-2 text-white font-semibold"
+                    >
                         <PlayIcon className="w-6 h-6"/>
                         <span>Watch Demo</span>
                     </HapticButton>
                 </div>
                 <div className={`mt-16 lg:mt-24 ${getAnimationClass('delay-500')}`}>
                     <GlassCard className="max-w-4xl mx-auto p-4">
-                        <div className="w-full aspect-video rounded-lg bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1556740758-90de374c12ad?q=80&w=1200&auto=format&fit=crop')" }}>
+                        <div 
+                            role="img"
+                            aria-label="A preview of the Tappit AI application interface showing a professional dashboard."
+                            className="w-full aspect-video rounded-lg bg-cover bg-center bg-no-repeat" 
+                            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1556740758-90de374c12ad?q=80&w=1200&auto=format&fit=crop')" }}>
                             {/* Placeholder for a product video or image */}
                         </div>
                     </GlassCard>

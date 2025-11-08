@@ -1,5 +1,3 @@
-
-// Fix: Change to namespace import to ensure JSX types are available globally.
 import * as React from 'react';
 
 interface VideoEmbedProps {
@@ -12,7 +10,6 @@ const VideoEmbed: React.FC<VideoEmbedProps> = ({ url }) => {
 
         let videoId: string | null = null;
         
-        // Fix: Updated YouTube Regex to be more robust and handle extra query parameters.
         const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
         const youtubeMatch = videoUrl.match(youtubeRegex);
         if (youtubeMatch) {

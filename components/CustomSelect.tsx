@@ -1,4 +1,3 @@
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import HapticButton from './HapticButton.tsx';
@@ -18,7 +17,6 @@ interface CustomSelectProps {
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({ options, value, onChange, placeholder }) => {
-    // Fix: Use React.useState, React.useRef, React.useEffect
     const [isOpen, setIsOpen] = React.useState(false);
     const wrapperRef = React.useRef<HTMLDivElement>(null);
     const [position, setPosition] = React.useState({ top: 0, left: 0, width: 0 });

@@ -1,5 +1,3 @@
-
-// Fix: Change to namespace import to ensure JSX types are available globally.
 import * as React from 'react';
 import GlassCard from '../GlassCard.tsx';
 
@@ -13,7 +11,6 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, change, previousValue, icon: Icon }) => {
     const isPositive = change >= 0;
-    // Fix: Ensure percentageChange is always a string to satisfy parseFloat's type signature.
     const percentageChange = previousValue !== 0 ? ((change / Math.abs(previousValue)) * 100).toFixed(0) : '0';
 
     return (

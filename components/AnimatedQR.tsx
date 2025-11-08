@@ -1,5 +1,3 @@
-
-// Fix: Remove redundant triple-slash directive for React types.
 import * as React from 'react';
 
 // Assuming QRCode is loaded from CDN and available on window

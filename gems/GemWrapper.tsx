@@ -1,5 +1,3 @@
-
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import { ChevronDownIcon } from '../components/icons.tsx';
 import { springTransition } from '../utils/spring.ts';
@@ -12,7 +10,6 @@ interface GemWrapperProps {
 }
 
 const GemWrapper: React.FC<GemWrapperProps> = ({ title, description, children }) => {
-    // Fix: Use React.useState
     const [isExpanded, setIsExpanded] = React.useState(false);
 
     return (

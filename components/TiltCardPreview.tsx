@@ -1,5 +1,3 @@
-
-// Fix: Remove redundant triple-slash directive for React types.
 import * as React from 'react';
 import useTilt from '../hooks/useTilt.ts';
 import { CardTemplate, CardField, FieldType } from '../types.ts';

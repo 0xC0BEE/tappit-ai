@@ -1,5 +1,3 @@
-
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
@@ -7,7 +5,6 @@ import { CertificateIcon, CloseIcon, ShareIcon, TreeIcon } from '../icons.tsx';
 import HapticButton from '../HapticButton.tsx';
 import { useHaptics, HapticPattern } from '../../hooks/useHaptics.ts';
 
-// Fix: Add confetti to the Window interface to fix TypeScript error.
 declare global {
     interface Window {
         confetti?: (options: any) => void;
@@ -22,7 +19,6 @@ interface PlantTreeCertificateProps {
 const PlantTreeCertificate: React.FC<PlantTreeCertificateProps> = ({ isOpen, onClose }) => {
     const { playHaptic } = useHaptics();
 
-    // Fix: Use React.useEffect
     React.useEffect(() => {
         if (isOpen) {
             playHaptic(HapticPattern.Success);

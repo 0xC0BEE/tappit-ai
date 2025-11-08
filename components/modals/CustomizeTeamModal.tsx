@@ -1,4 +1,3 @@
-// Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import Modal from '../Modal.tsx';
 import GlassCard from '../GlassCard.tsx';
@@ -19,7 +18,6 @@ interface CustomizeTeamModalProps {
 }
 
 const CustomizeTeamModal: React.FC<CustomizeTeamModalProps> = ({ isOpen, onClose, brandKit, setBrandKit, teamMembers }) => {
-    // Fix: Use React.useState
     const [isAssignModalOpen, setAssignModalOpen] = React.useState(false);
     const [isExportModalOpen, setExportModalOpen] = React.useState(false);
 

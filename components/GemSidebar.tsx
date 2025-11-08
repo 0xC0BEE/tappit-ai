@@ -1,4 +1,3 @@
-// Fix: Remove redundant triple-slash directive for React types.
 import * as React from 'react';
 import AIPolishButton from './AIPolishButton.tsx';
 import GlassCard from './GlassCard.tsx';
