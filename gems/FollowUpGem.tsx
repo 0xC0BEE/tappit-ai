@@ -1,11 +1,10 @@
-
 // Fix: Use namespace import for React to resolve JSX type errors.
 import * as React from 'react';
 import { GoogleGenAI } from "@google/genai";
 import HapticButton from '../components/HapticButton.tsx';
 import { EmailIcon, CalendarIcon } from '../components/icons.tsx';
 import SetReminderModal from '../components/modals/SetReminderModal.tsx';
-import { useHaptics, HapticPattern } from '../../hooks/useHaptics.ts';
+import { useHaptics, HapticPattern } from '../hooks/useHaptics.ts';
 
 const FollowUpGem: React.FC = () => {
     // Fix: Use React.useState
