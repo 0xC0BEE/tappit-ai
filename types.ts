@@ -59,6 +59,8 @@ export interface Contact {
     relationshipHealth: number;
     leadScore: number;
     interactions: Interaction[];
+    // FIX: Add optional 'calendly_url' property to support the Calendly Roulette feature. This property exists in the mock data.
+    calendly_url?: string | null;
 }
 
 export interface TeamMember {

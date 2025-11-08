@@ -23,15 +23,16 @@ const MOCK_DATA = {
         { id: 't5', name: 'Jade', className: 'bg-teal-600', textColor: 'text-white' },
     ],
     'contacts': [
-        { id: 'c1', name: 'John Smith', title: 'Lead Developer', company: 'CodeCrafters', photoUrl: 'https://api.dicebear.com/8.x/initials/png?seed=John%20Smith', lastInteraction: '2 days ago', relationshipHealth: 0.9, leadScore: 92, interactions: [
+        { id: 'c1', name: 'John Smith', title: 'Lead Developer', company: 'CodeCrafters', photoUrl: 'https://api.dicebear.com/8.x/initials/png?seed=John%20Smith', lastInteraction: '2 days ago', relationshipHealth: 0.9, leadScore: 92, last_interaction_date: '2025-11-03', calendly_url: 'https://calendly.com/john-smith', interactions: [
             { id: 'i1', type: InteractionType.Meeting, date: '2024-07-22', notes: 'Discussed technical integration.', event: 'Project Kickoff', location: 'Virtual' }
         ]},
-        { id: 'c2', name: 'Jane Doe', title: 'Product Manager', company: 'Innovate Inc.', photoUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Jane%20Doe', lastInteraction: '1 week ago', relationshipHealth: 0.6, leadScore: 78, interactions: [] },
-        { id: 'c3', name: 'Michael Scott', title: 'Regional Manager', company: 'Dunder Mifflin', photoUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Michael%20Scott', lastInteraction: '3 weeks ago', relationshipHealth: 0.2, leadScore: 45, interactions: [] },
+        { id: 'c2', name: 'Jane Doe', title: 'Product Manager', company: 'Innovate Inc.', photoUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Jane%20Doe', lastInteraction: '1 week ago', relationshipHealth: 0.6, leadScore: 78, last_interaction_date: '2025-10-28', calendly_url: 'https://calendly.com/jane-doe', interactions: [] },
+        { id: 'c3', name: 'Michael Scott', title: 'Regional Manager', company: 'Dunder Mifflin', photoUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Michael%20Scott', lastInteraction: '3 weeks ago', relationshipHealth: 0.2, leadScore: 45, last_interaction_date: '2025-10-14', calendly_url: null, interactions: [] },
     ],
     'team_members': [
         { id: 'tm1', name: 'Alex Bamboo', role: 'Admin', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Alex%20Bamboo', taps: 128, connections: 42, leadScore: 85 },
         { id: 'tm2', name: 'Michael Scott', role: 'Member', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Michael%20Scott', taps: 75, connections: 21, leadScore: 70 },
+        { id: 'tm3', name: 'Jane Doe', role: 'Member', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Jane%20Doe', taps: 98, connections: 33, leadScore: 79 },
     ],
     'brand_kit': [{ id: 'bk1', primaryColor: '#22c55e', font: 'Roboto', logoUrl: 'https://tailwindui.com/img/logos/mark.svg?color=green&shade=500' }],
     'team_activities': [
@@ -44,7 +45,23 @@ const MOCK_DATA = {
     ],
     'interactions': [
          { id: 'i1', contact_id: 'c1', type: InteractionType.Meeting, date: '2024-07-22', notes: 'Discussed technical integration.', event: 'Project Kickoff', location: 'Virtual' }
-    ]
+    ],
+    'green_streaks': [
+        { user_id: 'tm1', streak_count: 42, user: { name: 'Alex Bamboo', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Alex%20Bamboo'} },
+        { user_id: 'tm2', streak_count: 21, user: { name: 'Michael Scott', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Michael%20Scott'} },
+        { user_id: 'tm3', streak_count: 35, user: { name: 'Jane Doe', avatarUrl: 'https://api.dicebear.com/8.x/initials/png?seed=Jane%20Doe'} },
+    ],
+    'trees_planted': [
+        { id: 'tree1', user_id: 'tm1', certificate_id: 'TP-84B2-XYZ', location: 'Madagascar', timestamp: '2025-10-20T10:00:00Z' }
+    ],
+    'referrals': [
+        { id: 'r1', referrer_id: 'tm1', referred_id: 'user_a', status: 'completed' },
+        { id: 'r2', referrer_id: 'tm1', referred_id: 'user_b', status: 'completed' },
+        { id: 'r3', referrer_id: 'tm1', referred_id: 'user_c', status: 'pending' },
+    ],
+    // Empty tables for new features
+    'nfc_bumps': [],
+    'wallet_passes': [],
 };
 
 
@@ -84,9 +101,10 @@ class QueryBuilder {
     private isSingle: boolean = false;
     private filters: ((item: any) => boolean)[] = [];
     private limitCount: number | null = null;
+    private ordering: { column: string, ascending: boolean } | null = null;
 
     constructor(data: any[]) {
-        this.data = data;
+        this.data = [...data]; // Create a shallow copy to avoid modifying original mock data
     }
 
     select(columns = '*') {
@@ -102,6 +120,11 @@ class QueryBuilder {
 
     eq(column: string, value: any) {
         this.filters.push(item => item[column] === value);
+        return this;
+    }
+
+    order(column: string, { ascending } = { ascending: true }) {
+        this.ordering = { column, ascending };
         return this;
     }
 
@@ -123,6 +146,15 @@ class QueryBuilder {
             this.filters.forEach(filter => {
                 result = result.filter(filter);
             });
+
+            if (this.ordering) {
+                const { column, ascending } = this.ordering;
+                result.sort((a, b) => {
+                    if (a[column] < b[column]) return ascending ? -1 : 1;
+                    if (a[column] > b[column]) return ascending ? 1 : -1;
+                    return 0;
+                });
+            }
     
             if (this.limitCount !== null) {
                 result = result.slice(0, this.limitCount);
